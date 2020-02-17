@@ -4,37 +4,37 @@
 
 static HMODULE opengl_module = NULL;
 
-typedef void* (APIENTRY* PWGLGETPROCADDRESS)(char const*);
-static PWGLGETPROCADDRESS mimas_wglGetProcAddress = NULL;
+typedef void* (*PFN_wlgGetProcAddress)(char const*);
+static PFN_wlgGetProcAddress mimas_wglGetProcAddress = NULL;
 #define wglGetProcAddress mimas_wglGetProcAddress
 
-HGLRC (APIENTRY* mimas_wglCreateContext)(HDC hdc);
-BOOL (APIENTRY* mimas_wglDeleteContext)(HGLRC hglrc);
-HDC (APIENTRY* mimas_wglGetCurrentDC)();
-HGLRC (APIENTRY* mimas_wglGetCurrentContext)();
-BOOL (APIENTRY* mimas_wglMakeCurrent)(HDC hdc, HGLRC hglrc);
-BOOL (APIENTRY* mimas_wglShareLists)(HGLRC hglrc1, HGLRC hglrc2);
-void (APIENTRY* mimas_wglSwapBuffers)(HDC hdc);
+PFN_wglCreateContext mimas_wglCreateContext = NULL;
+PFN_wglDeleteContext mimas_wglDeleteContext = NULL;
+PFN_wglGetCurrentDC mimas_wglGetCurrentDC = NULL;
+PFN_wglGetCurrentContext mimas_wglGetCurrentContext = NULL;
+PFN_wglMakeCurrent mimas_wglMakeCurrent = NULL;
+PFN_wglShareLists mimas_wglShareLists = NULL;
+PFN_wglSwapBuffers mimas_wglSwapBuffers = NULL;
 
-char const*(APIENTRY* mimas_wglGetExtensionsStringARB)(HDC hdc) = NULL;
-HGLRC (APIENTRY* mimas_wglCreateContextAttribsARB)(HDC hDC, HGLRC hShareContext, int const* attribList) = NULL;
-BOOL (WINAPI* mimas_wglGetPixelFormatAttribivARB)(HDC hdc, int iPixelFormat, int iLayerPlane, UINT nAttributes, int const* piAttributes, int* piValues) = NULL;
-BOOL (WINAPI* mimas_wglGetPixelFormatAttribfvARB)(HDC hdc, int iPixelFormat, int iLayerPlane, UINT nAttributes, int const* piAttributes, FLOAT* pfValues) = NULL;
-BOOL (WINAPI* mimas_wglChoosePixelFormatARB)(HDC hdc, int const* piAttribIList, FLOAT const* pfAttribFList, UINT nMaxFormats, int* piFormats, UINT* nNumFormats) = NULL;
-BOOL (WINAPI* mimas_wglSwapIntervalEXT)(int interval) = NULL;
-int (WINAPI* mimas_wglGetSwapIntervalEXT)(void) = NULL;
+PFN_wglGetExtensionsStringARB mimas_wglGetExtensionsStringARB = NULL;
+PFN_wglCreateContextAttribsARB mimas_wglCreateContextAttribsARB = NULL;
+PFN_wglGetPixelFormatAttribivARB mimas_wglGetPixelFormatAttribivARB = NULL;
+PFN_wglGetPixelFormatAttribfvARB mimas_wglGetPixelFormatAttribfvARB = NULL;
+PFN_wglChoosePixelFormatARB mimas_wglChoosePixelFormatARB = NULL;
+PFN_wglSwapIntervalEXT mimas_wglSwapIntervalEXT = NULL;
+PFN_wglGetSwapIntervalEXT mimas_wglGetSwapIntervalEXT = NULL;
 
 mimas_bool mimas_load_wgl(HDC const hdc) {
     opengl_module = LoadLibraryW(L"opengl32.dll");
     if(opengl_module) {
-        mimas_wglGetProcAddress = (PWGLGETPROCADDRESS)GetProcAddress(opengl_module, "wglGetProcAddress");
-        mimas_wglCreateContext = (PWGLCREATECONTEXT)GetProcAddress(opengl_module, "wglCreateContext");
-        mimas_wglDeleteContext = (PWGLDELETECONTEXT)GetProcAddress(opengl_module, "wglDeleteContext");
-        mimas_wglGetCurrentDC = (PWGLGETCURRENTDC)GetProcAddress(opengl_module, "wglGetCurrentDC");
-        mimas_wglGetCurrentContext = (PWGLGETCURRENTCONTEXT)GetProcAddress(opengl_module, "wglGetCurrentContext");
-        mimas_wglMakeCurrent = (PWGLMAKECURRENT)GetProcAddress(opengl_module, "wglMakeCurrent");
-        mimas_wglShareLists = (PWGLSHARELISTS)GetProcAddress(opengl_module, "wglShareLists");
-        mimas_wglSwapBuffers = (PWGLSWAPBUFFERS)SwapBuffers;
+        mimas_wglGetProcAddress = (PFN_wlgGetProcAddress)GetProcAddress(opengl_module, "wglGetProcAddress");
+        mimas_wglCreateContext = (PFN_wglCreateContext)GetProcAddress(opengl_module, "wglCreateContext");
+        mimas_wglDeleteContext = (PFN_wglDeleteContext)GetProcAddress(opengl_module, "wglDeleteContext");
+        mimas_wglGetCurrentDC = (PFN_wglGetCurrentDC)GetProcAddress(opengl_module, "wglGetCurrentDC");
+        mimas_wglGetCurrentContext = (PFN_wglGetCurrentContext)GetProcAddress(opengl_module, "wglGetCurrentContext");
+        mimas_wglMakeCurrent = (PFN_wglMakeCurrent)GetProcAddress(opengl_module, "wglMakeCurrent");
+        mimas_wglShareLists = (PFN_wglShareLists)GetProcAddress(opengl_module, "wglShareLists");
+        mimas_wglSwapBuffers = (PFN_wglSwapBuffers)SwapBuffers;
 
         HDC const prev_hdc = wglGetCurrentDC();
         HGLRC const prev_hglrc = wglGetCurrentContext();
@@ -52,13 +52,13 @@ mimas_bool mimas_load_wgl(HDC const hdc) {
             return mimas_false;
         }
 
-        mimas_wglGetExtensionsStringARB = (PWGLGETEXTENSIONSSTRINGARB)wglGetProcAddress("wglGetExtensionsStringARB");
-        mimas_wglCreateContextAttribsARB = (PWGLCREATECONTEXTATTRIBSARB)wglGetProcAddress("wglCreateContextAttribsARB");
-        mimas_wglGetPixelFormatAttribivARB = (PWGLGETPIXELFORMATATTRIBIVARB)wglGetProcAddress("wglGetPixelFormatAttribivARB");
-        mimas_wglGetPixelFormatAttribfvARB = (PWGLGETPIXELFORMATATTRIBFVARB)wglGetProcAddress("wglGetPixelFormatAttribfvARB");
-        mimas_wglChoosePixelFormatARB = (PWGLCHOOSEPIXELFORMATARB)wglGetProcAddress("wglChoosePixelFormatARB");
-        mimas_wglSwapIntervalEXT = (PWGLSWAPINTERVALEXT)wglGetProcAddress("wglSwapIntervalEXT");
-        mimas_wglGetSwapIntervalEXT = (PWGLGETSWAPINTERVALEXT)wglGetProcAddress("wglGetSwapIntervalEXT");
+        mimas_wglGetExtensionsStringARB = (PFN_wglGetExtensionsStringARB)wglGetProcAddress("wglGetExtensionsStringARB");
+        mimas_wglCreateContextAttribsARB = (PFN_wglCreateContextAttribsARB)wglGetProcAddress("wglCreateContextAttribsARB");
+        mimas_wglGetPixelFormatAttribivARB = (PFN_wglGetPixelFormatAttribivARB)wglGetProcAddress("wglGetPixelFormatAttribivARB");
+        mimas_wglGetPixelFormatAttribfvARB = (PFN_wglGetPixelFormatAttribfvARB)wglGetProcAddress("wglGetPixelFormatAttribfvARB");
+        mimas_wglChoosePixelFormatARB = (PFN_wglChoosePixelFormatARB)wglGetProcAddress("wglChoosePixelFormatARB");
+        mimas_wglSwapIntervalEXT = (PFN_wglSwapIntervalEXT)wglGetProcAddress("wglSwapIntervalEXT");
+        mimas_wglGetSwapIntervalEXT = (PFN_wglGetSwapIntervalEXT)wglGetProcAddress("wglGetSwapIntervalEXT");
 
         wglMakeCurrent(prev_hdc, prev_hglrc);
         wglDeleteContext(hglrc);

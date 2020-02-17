@@ -3,7 +3,7 @@
 
 #include <mimas/mimas.h>
 
-EXTERN_C_BEGIN
+MIMAS_EXTERN_C_BEGIN
 
 typedef struct Mimas_GL_Context Mimas_GL_Context;
 
@@ -18,6 +18,6 @@ MIMAS_API Mimas_GL_Context* mimas_create_gl_context(mimas_i32 version_major, mim
 MIMAS_API void mimas_destroy_gl_context(Mimas_GL_Context* ctx);
 MIMAS_API mimas_bool mimas_make_context_current(Mimas_Window* const window, Mimas_GL_Context* const ctx);
 
-EXTERN_C_END
+MIMAS_EXTERN_C_END
 
 #endif // !MIMAS_MIMAS_GL_H_INCLUDE

@@ -19,6 +19,31 @@ static mimas_u32 get_window_extended_styles(Mimas_Window const* const window) {
     return WS_EX_APPWINDOW;
 }
 
+// Capture cursor in the client area of window.
+//
+static void capture_cursor(Mimas_Window* const window) {
+    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+    RECT clientRect;
+    GetClientRect(native_window, &clientRect);
+    ClientToScreen(native_window, (POINT*)&clientRect.left);
+    ClientToScreen(native_window, (POINT*)&clientRect.right);
+    ClipCursor(&clientRect);
+}
+
+static void release_captured_cursor() {
+    ClipCursor(NULL);
+}
+
+static void enable_virtual_cursor(Mimas_Window* const window) {
+    // Capture in case we lag and the cursor moves out of the window.
+    capture_cursor(window);
+
+}
+
+static void disable_virtual_cursor(Mimas_Window* const window) {
+    release_captured_cursor(window);
+}
+
 static mimas_i32 window_hit_test(mimas_i32 const cursor_x, mimas_i32 const cursor_y, RECT const window_rect) {
     enum Region_Mask {
         client = 0, 
@@ -70,14 +95,6 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
         case WM_NCCALCSIZE: {
             if(wparam == TRUE && !window->decorated) {
-                NCCALCSIZE_PARAMS* const params = (NCCALCSIZE_PARAMS*)lparam;
-                // RECT window_rect;
-                // GetWindowRect(hwnd, &window_rect);
-                // printf("Window Rect: %d %d %d %d; NCCALCSIZE_PARAMS: %d %d %d %d\n", window_rect.left, window_rect.top, window_rect.right, window_rect.bottom, params->rgrc[0].left, params->rgrc[0].top, params->rgrc[0].right, params->rgrc[0].bottom);
-
-                params->rgrc[0].left -= 8;
-                params->rgrc[0].bottom -= 8;
-                params->rgrc[0].right -= 8;
                 return 0;
             }
         } break;
@@ -112,17 +129,17 @@ static mimas_bool unregister_window_class() {
     return UnregisterClass(MIMAS_WINDOW_CLASS_NAME, NULL);
 }
 
-static Mimas_Window* create_native_window(mimas_i32 const width, mimas_i32 const height, char const* const title, mimas_bool const decorated) {
+static Mimas_Window* create_native_window(Mimas_Window_Create_Info const info) {
     Mimas_Window* const window = (Mimas_Window*)malloc(sizeof(Mimas_Window));
     memset(window, 0, sizeof(Mimas_Window));
 
-    window->decorated = decorated;
+    window->decorated = info.decorated;
 
     mimas_u32 const style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
-    int const wtitle_buffer_size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, title, -1, NULL, 0);
+    int const wtitle_buffer_size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, info.title, -1, NULL, 0);
     wchar_t* wtitle = malloc(sizeof(wchar_t) * wtitle_buffer_size);
-    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, title, -1, wtitle, wtitle_buffer_size);
-    HWND const hwnd = CreateWindowEx(WS_EX_APPWINDOW, MIMAS_WINDOW_CLASS_NAME, wtitle, style, CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, GetModuleHandle(NULL), NULL);
+    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, info.title, -1, wtitle, wtitle_buffer_size);
+    HWND const hwnd = CreateWindowEx(WS_EX_APPWINDOW, MIMAS_WINDOW_CLASS_NAME, wtitle, style, CW_USEDEFAULT, CW_USEDEFAULT, info.width, info.height, NULL, NULL, GetModuleHandle(NULL), NULL);
     free(wtitle);
 
     if(!hwnd) {
@@ -159,7 +176,7 @@ static Mimas_Window* create_native_window(mimas_i32 const width, mimas_i32 const
 
     SetProp(hwnd, L"Mimas_Window", (HANDLE)window);
 
-    if(!decorated) {
+    if(!info.decorated) {
         MARGINS const margins = {1, 1, 1, 1};
         DwmExtendFrameIntoClientArea(hwnd, &margins);
         SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER);
@@ -223,7 +240,7 @@ mimas_bool mimas_platform_init_with_gl() {
         return mimas_false;
     }
 
-    Mimas_Window* const dummy_window = create_native_window(1280, 720, "MIMAS_HELPER_WINDOW", mimas_false);
+    Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
     if(!dummy_window) {
         unregister_window_class();
         free(platform);
@@ -260,7 +277,7 @@ mimas_bool mimas_platform_init_with_gl() {
     return mimas_true;
 }
 
-void mimas_platform_terminate() {
+void mimas_platform_terminate_with_gl() {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas->platform;
     destroy_native_window(platform->dummy_window);
@@ -281,8 +298,8 @@ void mimas_platform_poll_events() {
     GetKeyboardState(platform->keyboard_state);
 }
 
-Mimas_Window* mimas_platform_create_window(mimas_i32 const width, mimas_i32 const height, char const* const title, mimas_bool const decorated) {
-    return create_native_window(width, height, title, decorated);
+Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info const info) {
+    return create_native_window(info);
 }
 
 void mimas_platform_destroy_window(Mimas_Window* const window) {
@@ -365,4 +382,9 @@ void mimas_platform_minimize_window(Mimas_Window* const window) {
 void mimas_platform_maximize_window(Mimas_Window* const window) {
     Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
     ShowWindow(native_window->handle, SW_MAXIMIZE);
+}
+
+// TODO: Move to input.c
+void mimas_platform_set_cursor_mode(Mimas_Window* const window, Mimas_Cursor_Mode const cursor_mode) {
+    window->cursor_mode = cursor_mode;
 }

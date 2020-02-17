@@ -2,8 +2,20 @@
 #include <internal.h>
 #include <platform.h>
 
+#include <platform_gl.h>
+#include <platform_vk.h>
+
 void mimas_terminate() {
-    mimas_platform_terminate();
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    switch(_mimas->backend) {
+        case MIMAS_BACKEND_GL: {
+            mimas_platform_terminate_with_gl();
+        } break;
+
+        case MIMAS_BACKEND_VK: {
+            mimas_platform_terminate_with_vk();
+        } break;
+    }
     _mimas_terminate_internal();
 }
 
@@ -11,8 +23,8 @@ void mimas_poll_events() {
     mimas_platform_poll_events();
 }
 
-Mimas_Window* mimas_create_window(mimas_i32 width, mimas_i32 height, char const* title) {
-    return mimas_platform_create_window(width, height, title, mimas_false);
+Mimas_Window* mimas_create_window(Mimas_Window_Create_Info const info) {
+    return mimas_platform_create_window(info);
 }
 
 void mimas_destroy_window(Mimas_Window* window) {
@@ -66,4 +78,12 @@ void mimas_minimize_window(Mimas_Window* const window) {
 
 void mimas_maximize_window(Mimas_Window* const window) {
     mimas_platform_maximize_window(window);
+}
+
+void mimas_set_cursor_mode(Mimas_Window* const window, Mimas_Cursor_Mode const cursor_mode) {
+    mimas_platform_set_cursor_mode(window, cursor_mode);
+}
+
+void mimas_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
+    mimas_platform_get_cursor_pos(x, y);
 }

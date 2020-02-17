@@ -12,8 +12,10 @@ if(WIN32)
     message(STATUS "Mimas compiled for Win32")
     target_sources(mimas
         PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/win/gl_context.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/win/gl.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/win/input.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/platform.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/win/vk.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/wgl.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/wgl.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/window.c"

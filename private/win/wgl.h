@@ -11,24 +11,25 @@
 mimas_bool mimas_load_wgl(HDC);
 void mimas_unload_wgl();
 
-typedef char const* (APIENTRY* PWGLGETEXTENSIONSSTRINGARB)(HDC);
-extern PWGLGETEXTENSIONSSTRINGARB mimas_wglGetExtensionsStringARB;
+typedef char const* (*PFN_wglGetExtensionsStringARB)(HDC);
+extern PFN_wglGetExtensionsStringARB mimas_wglGetExtensionsStringARB;
 #define wglGetExtensionsStringARB mimas_wglGetExtensionsStringARB;
 
-typedef HGLRC (APIENTRY* PWGLCREATECONTEXT)(HDC);
-typedef BOOL (APIENTRY* PWGLDELETECONTEXT)(HGLRC);
-typedef HDC(APIENTRY* PWGLGETCURRENTDC)();
-typedef HGLRC(APIENTRY* PWGLGETCURRENTCONTEXT)();
-typedef BOOL (APIENTRY* PWGLMAKECURRENT)(HDC, HGLRC);
-typedef BOOL (APIENTRY* PWGLSHARELISTS)(HGLRC, HGLRC);
-typedef void (APIENTRY* PWGLSWAPBUFFERS)(HDC);
-extern PWGLCREATECONTEXT mimas_wglCreateContext;
-extern PWGLDELETECONTEXT mimas_wglDeleteContext;
-extern PWGLGETCURRENTDC mimas_wglGetCurrentDC;
-extern PWGLGETCURRENTCONTEXT mimas_wglGetCurrentContext;
-extern PWGLMAKECURRENT mimas_wglMakeCurrent;
-extern PWGLSHARELISTS mimas_wglShareLists;
-extern PWGLSWAPBUFFERS mimas_wglSwapBuffers;
+
+typedef HGLRC (*PFN_wglCreateContext)(HDC);
+typedef BOOL (*PFN_wglDeleteContext)(HGLRC);
+typedef HDC(*PFN_wglGetCurrentDC)();
+typedef HGLRC(*PFN_wglGetCurrentContext)();
+typedef BOOL (*PFN_wglMakeCurrent)(HDC, HGLRC);
+typedef BOOL (*PFN_wglShareLists)(HGLRC, HGLRC);
+typedef void (*PFN_wglSwapBuffers)(HDC);
+extern PFN_wglCreateContext mimas_wglCreateContext;
+extern PFN_wglDeleteContext mimas_wglDeleteContext;
+extern PFN_wglGetCurrentDC mimas_wglGetCurrentDC;
+extern PFN_wglGetCurrentContext mimas_wglGetCurrentContext;
+extern PFN_wglMakeCurrent mimas_wglMakeCurrent;
+extern PFN_wglShareLists mimas_wglShareLists;
+extern PFN_wglSwapBuffers mimas_wglSwapBuffers;
 #define wglCreateContext mimas_wglCreateContext
 #define wglDeleteContext mimas_wglDeleteContext
 #define wglGetCurrentDC mimas_wglGetCurrentDC
@@ -36,6 +37,7 @@ extern PWGLSWAPBUFFERS mimas_wglSwapBuffers;
 #define wglMakeCurrent mimas_wglMakeCurrent
 #define wglShareLists mimas_wglShareLists
 #define wglSwapBuffers mimas_wglSwapBuffers
+
 
 // WGL_ARB_create_context
 #define WGL_CONTEXT_MAJOR_VERSION_ARB               0x2091
@@ -50,8 +52,8 @@ extern PWGLSWAPBUFFERS mimas_wglSwapBuffers;
 #define WGL_CONTEXT_FLAGS_ARB                       0x2094
 #define ERROR_INVALID_VERSION_ARB                   0x2095
 #define ERROR_INVALID_PROFILE_ARB                   0x2096
-typedef HGLRC (APIENTRY* PWGLCREATECONTEXTATTRIBSARB)(HDC hDC, HGLRC hShareContext, int const* attribList);
-extern PWGLCREATECONTEXTATTRIBSARB mimas_wglCreateContextAttribsARB;
+typedef HGLRC (*PFN_wglCreateContextAttribsARB)(HDC hDC, HGLRC hShareContext, int const* attribList);
+extern PFN_wglCreateContextAttribsARB mimas_wglCreateContextAttribsARB;
 #define wglCreateContextAttribsARB mimas_wglCreateContextAttribsARB
 
 
@@ -105,22 +107,21 @@ extern PWGLCREATECONTEXTATTRIBSARB mimas_wglCreateContextAttribsARB;
 #define WGL_SWAP_UNDEFINED_ARB            0x202A
 #define WGL_TYPE_RGBA_ARB                 0x202B
 #define WGL_TYPE_COLORINDEX_ARB           0x202C
-
-typedef BOOL (WINAPI* PWGLGETPIXELFORMATATTRIBIVARB)(HDC hdc, int iPixelFormat, int iLayerPlane, UINT nAttributes, int const* piAttributes, int* piValues);
-typedef BOOL (WINAPI* PWGLGETPIXELFORMATATTRIBFVARB)(HDC hdc, int iPixelFormat, int iLayerPlane, UINT nAttributes, int const* piAttributes, FLOAT* pfValues);
-typedef BOOL (WINAPI* PWGLCHOOSEPIXELFORMATARB)(HDC hdc, int const* piAttribIList, FLOAT const* pfAttribFList, UINT nMaxFormats, int* piFormats, UINT* nNumFormats);
-extern PWGLGETPIXELFORMATATTRIBIVARB mimas_wglGetPixelFormatAttribivARB;
-extern PWGLGETPIXELFORMATATTRIBFVARB mimas_wglGetPixelFormatAttribfvARB;
-extern PWGLCHOOSEPIXELFORMATARB mimas_wglChoosePixelFormatARB;
+typedef BOOL (WINAPI* PFN_wglGetPixelFormatAttribivARB)(HDC hdc, int iPixelFormat, int iLayerPlane, UINT nAttributes, int const* piAttributes, int* piValues);
+typedef BOOL (WINAPI* PFN_wglGetPixelFormatAttribfvARB)(HDC hdc, int iPixelFormat, int iLayerPlane, UINT nAttributes, int const* piAttributes, FLOAT* pfValues);
+typedef BOOL (WINAPI* PFN_wglChoosePixelFormatARB)(HDC hdc, int const* piAttribIList, FLOAT const* pfAttribFList, UINT nMaxFormats, int* piFormats, UINT* nNumFormats);
+extern PFN_wglGetPixelFormatAttribivARB mimas_wglGetPixelFormatAttribivARB;
+extern PFN_wglGetPixelFormatAttribfvARB mimas_wglGetPixelFormatAttribfvARB;
+extern PFN_wglChoosePixelFormatARB mimas_wglChoosePixelFormatARB;
 #define wglGetPixelFormatAttribivARB mimas_wglGetPixelFormatAttribivARB
 #define wglGetPixelFormatAttribfvARB mimas_wglGetPixelFormatAttribfvARB
 #define wglChoosePixelFormatARB mimas_wglChoosePixelFormatARB
 
-// WGL_EXT_swap_control
 
-typedef BOOL (WINAPI* PWGLSWAPINTERVALEXT)(int interval);
-typedef int (WINAPI* PWGLGETSWAPINTERVALEXT)(void);
-extern PWGLSWAPINTERVALEXT mimas_wglSwapIntervalEXT;
-extern PWGLGETSWAPINTERVALEXT mimas_wglGetSwapIntervalEXT;
+// WGL_EXT_swap_control
+typedef BOOL (WINAPI* PFN_wglSwapIntervalEXT)(int interval);
+typedef int (WINAPI* PFN_wglGetSwapIntervalEXT)(void);
+extern PFN_wglSwapIntervalEXT mimas_wglSwapIntervalEXT;
+extern PFN_wglGetSwapIntervalEXT mimas_wglGetSwapIntervalEXT;
 #define wglSwapIntervalEXT mimas_wglSwapIntervalEXT
 #define wglGetSwapIntervalEXT mimas_wglGetSwapIntervalEXT

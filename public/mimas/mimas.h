@@ -18,14 +18,14 @@
 #endif
 
 #if defined(__cplusplus)
-    #define EXTERN_C_BEGIN extern "C" {
-    #define EXTERN_C_END }
+    #define MIMAS_EXTERN_C_BEGIN extern "C" {
+    #define MIMAS_EXTERN_C_END }
 #else 
-    #define EXTERN_C_BEGIN
-    #define EXTERN_C_END
+    #define MIMAS_EXTERN_C_BEGIN
+    #define MIMAS_EXTERN_C_END
 #endif
 
-EXTERN_C_BEGIN
+MIMAS_EXTERN_C_BEGIN
 
 #define MIMAS_KEY_UNKNOWN -1
 
@@ -80,14 +80,27 @@ typedef unsigned int mimas_u32;
 typedef long long mimas_i64;
 typedef unsigned long long mimas_u64;
 
+typedef enum Mimas_Cursor_Mode {
+    MIMAS_CURSOR_NORMAL,
+    MIMAS_CURSOR_CAPTURED,
+    MIMAS_CURSOR_VIRTUAL,
+} Mimas_Cursor_Mode;
+
 typedef struct Mimas_Window Mimas_Window;
 
 MIMAS_API void mimas_terminate();
 
 MIMAS_API void mimas_poll_events();
 
-MIMAS_API Mimas_Window* mimas_create_window(mimas_i32 width, mimas_i32 height, char const* title);
-MIMAS_API void destroy_window(Mimas_Window* window);
+typedef struct Mimas_Window_Create_Info {
+    mimas_i32 width;
+    mimas_i32 height;
+    char const* title;
+    mimas_bool decorated;
+} Mimas_Window_Create_Info;
+
+MIMAS_API Mimas_Window* mimas_create_window(Mimas_Window_Create_Info);
+MIMAS_API void mimas_destroy_window(Mimas_Window* window);
 
 typedef void(*mimas_window_activate_callback)(Mimas_Window* window, mimas_i32 activated, void* user_data);
 // activated parameter is 1 if activated, 0 if deactivated.
@@ -106,6 +119,9 @@ MIMAS_API void mimas_restore_window(Mimas_Window* window);
 MIMAS_API void mimas_minimize_window(Mimas_Window* window);
 MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 
-EXTERN_C_END
+MIMAS_API void mimas_set_cursor_mode(Mimas_Window* window, Mimas_Cursor_Mode);
+MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
+
+MIMAS_EXTERN_C_END
 
 #endif // !MIMAS_MIMAS_H_INCLUDE
