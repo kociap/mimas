@@ -119,6 +119,7 @@ MIMAS_API void mimas_restore_window(Mimas_Window* window);
 MIMAS_API void mimas_minimize_window(Mimas_Window* window);
 MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 
+MIMAS_API void mimas_swap_buffers(Mimas_Window* window);
 MIMAS_API void mimas_set_swap_interval(mimas_i32);
 MIMAS_API mimas_i32 mimas_get_swap_interval();
 

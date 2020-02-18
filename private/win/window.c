@@ -384,6 +384,12 @@ void mimas_platform_maximize_window(Mimas_Window* const window) {
     ShowWindow(native_window->handle, SW_MAXIMIZE);
 }
 
+void mimas_platform_swap_buffers(Mimas_Window* const window) {
+    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+    HDC const hdc = GetDC(native_window->handle);
+    wglSwapBuffers(hdc);
+}
+
 void mimas_platform_set_swap_interval(mimas_i32 const interval) {
     wglSwapIntervalEXT(interval);
 }

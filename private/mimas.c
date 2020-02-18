@@ -80,6 +80,10 @@ void mimas_maximize_window(Mimas_Window* const window) {
     mimas_platform_maximize_window(window);
 }
 
+void mimas_swap_buffers(Mimas_Window* const window) {
+    mimas_platform_swap_buffers(window);
+}
+
 void mimas_set_swap_interval(mimas_i32 const interval) {
     mimas_platform_set_swap_interval(interval);
 }
