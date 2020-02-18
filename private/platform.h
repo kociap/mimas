@@ -24,6 +24,9 @@ void mimas_platform_restore_window(Mimas_Window*);
 void mimas_platform_minimize_window(Mimas_Window*);
 void mimas_platform_maximize_window(Mimas_Window*);
 
+void mimas_platform_set_swap_interval(mimas_i32);
+mimas_i32 mimas_platform_get_swap_interval();
+
 void mimas_platform_set_cursor_mode(Mimas_Window*, Mimas_Cursor_Mode);
 void mimas_platform_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 

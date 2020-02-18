@@ -80,6 +80,14 @@ void mimas_maximize_window(Mimas_Window* const window) {
     mimas_platform_maximize_window(window);
 }
 
+void mimas_set_swap_interval(mimas_i32 const interval) {
+    mimas_platform_set_swap_interval(interval);
+}
+
+mimas_i32 mimas_get_swap_interval() {
+    return mimas_platform_get_swap_interval();
+}
+
 void mimas_set_cursor_mode(Mimas_Window* const window, Mimas_Cursor_Mode const cursor_mode) {
     mimas_platform_set_cursor_mode(window, cursor_mode);
 }

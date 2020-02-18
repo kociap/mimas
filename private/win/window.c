@@ -384,6 +384,14 @@ void mimas_platform_maximize_window(Mimas_Window* const window) {
     ShowWindow(native_window->handle, SW_MAXIMIZE);
 }
 
+void mimas_platform_set_swap_interval(mimas_i32 const interval) {
+    wglSwapIntervalEXT(interval);
+}
+
+mimas_i32 mimas_platform_get_swap_interval() {
+    return wglGetSwapIntervalEXT();
+}
+
 // TODO: Move to input.c
 void mimas_platform_set_cursor_mode(Mimas_Window* const window, Mimas_Cursor_Mode const cursor_mode) {
     window->cursor_mode = cursor_mode;
