@@ -154,23 +154,35 @@ MIMAS_API Mimas_Window* mimas_create_window(Mimas_Window_Create_Info);
 MIMAS_API void mimas_destroy_window(Mimas_Window* window);
 MIMAS_API mimas_bool mimas_close_requested(Mimas_Window* window);
 
+typedef struct Mimas_Callback {
+    void* callback;
+    void* user_data;
+} Mimas_Callback;
+
 /*
  * activated parameter is 1 if activated, 0 if deactivated.
  */
 typedef void (*mimas_window_activate_callback)(Mimas_Window* window, mimas_i32 activated, void* user_data);
 MIMAS_API void mimas_set_window_activate_callback(Mimas_Window* window, mimas_window_activate_callback callback, void* user_data);
+MIMAS_API Mimas_Callback mimas_get_window_activate_callback(Mimas_Window* window);
 
 /*
  * x and y are the screen coordinates of the cursor.
  */
 typedef void (*mimas_window_cursor_pos_callback)(Mimas_Window* window, mimas_i32 x, mimas_i32 y, void* user_data);
 MIMAS_API void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data);
+MIMAS_API Mimas_Callback mimas_get_cursor_pos_callback(Mimas_Window* window);
 
 typedef void (*mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, Mimas_Key_Action state, void* user_data);
 MIMAS_API void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data);
+MIMAS_API Mimas_Callback mimas_get_window_key_callback(Mimas_Window* window);
 
+/*
+ * Set custom hit function for the native window to define custom resize, drag, minimize, maximize and close behaviour.
+ */
 typedef Mimas_Hittest_Result (*mimas_window_hittest)(Mimas_Window* window, mimas_i32 cursor_x, mimas_i32 cursor_y, Mimas_Rect window_rect, Mimas_Rect client_rect);
 MIMAS_API void mimas_set_window_hittest(Mimas_Window* window, mimas_window_hittest callback);
+MIMAS_API Mimas_Callback mimas_get_window_hittest(Mimas_Window* window);
 
 MIMAS_API void mimas_set_window_pos(Mimas_Window* window, mimas_i32 x, mimas_i32 y);
 MIMAS_API void mimas_get_window_pos(Mimas_Window* window, mimas_i32* x, mimas_i32* y);

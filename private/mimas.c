@@ -1,9 +1,10 @@
 #include <mimas/mimas.h>
 #include <internal.h>
 #include <platform.h>
-
 #include <platform_gl.h>
 #include <platform_vk.h>
+
+#include <stdlib.h>
 
 void mimas_terminate() {
     mimas_platform_terminate();
@@ -31,9 +32,17 @@ void mimas_set_window_activate_callback(Mimas_Window* window, mimas_window_activ
     window->callbacks.window_activate_data = user_data;
 }
 
+Mimas_Callback mimas_get_window_activate_callback(Mimas_Window* window) {
+    return (Mimas_Callback){(void*)window->callbacks.window_activate, window->callbacks.window_activate_data};
+}
+
 void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data) {
     window->callbacks.cursor_pos = callback;
     window->callbacks.cursor_pos_data = user_data;
+}
+
+Mimas_Callback mimas_get_window_cursor_pos_callback(Mimas_Window* window) {
+    return (Mimas_Callback){(void*)window->callbacks.cursor_pos, window->callbacks.cursor_pos_data};
 }
 
 void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data) {
@@ -41,8 +50,16 @@ void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callba
     window->callbacks.key_data = user_data;
 }
 
+Mimas_Callback mimas_get_window_key_callback(Mimas_Window* window) {
+    return (Mimas_Callback){(void*)window->callbacks.key, window->callbacks.key_data};
+}
+
 void mimas_set_window_hittest(Mimas_Window* window, mimas_window_hittest callback) {
     window->callbacks.hittest = callback;
+}
+
+Mimas_Callback mimas_get_window_hittest(Mimas_Window* window) {
+    return (Mimas_Callback){(void*)window->callbacks.hittest, NULL};
 }
 
 void mimas_set_window_pos(Mimas_Window* const window, mimas_i32 const x, mimas_i32 const y) {
