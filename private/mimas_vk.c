@@ -14,3 +14,7 @@ mimas_bool mimas_init_with_vk() {
 char const** mimas_get_vk_extensions() {
     return mimas_platform_get_vk_extensions();
 }
+
+mimas_i32 mimas_create_vk_surface(Mimas_Window* const window, VkInstance const instance, struct VkAllocationCallbacks const* allocation_callbacks, VkSurfaceKHR* const surface) {
+    return mimas_platform_create_vk_surface(window, instance, allocation_callbacks, surface);
+}

@@ -120,6 +120,7 @@ static mimas_bool register_window_class() {
         .hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH),
         .hCursor = LoadCursor(NULL, IDC_ARROW),
         .lpszClassName = MIMAS_WINDOW_CLASS_NAME,
+        .hInstance = NULL,
     };
     return RegisterClassEx(&wndclass);
 }
@@ -139,7 +140,7 @@ static Mimas_Window* create_native_window(Mimas_Window_Create_Info const info) {
     int const wtitle_buffer_size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, info.title, -1, NULL, 0);
     wchar_t* wtitle = malloc(sizeof(wchar_t) * wtitle_buffer_size);
     MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, info.title, -1, wtitle, wtitle_buffer_size);
-    HWND const hwnd = CreateWindowEx(WS_EX_APPWINDOW, MIMAS_WINDOW_CLASS_NAME, wtitle, style, CW_USEDEFAULT, CW_USEDEFAULT, info.width, info.height, NULL, NULL, GetModuleHandle(NULL), NULL);
+    HWND const hwnd = CreateWindowEx(WS_EX_APPWINDOW, MIMAS_WINDOW_CLASS_NAME, wtitle, style, CW_USEDEFAULT, CW_USEDEFAULT, info.width, info.height, NULL, NULL, NULL, NULL);
     free(wtitle);
 
     if(!hwnd) {

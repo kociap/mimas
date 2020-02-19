@@ -13,7 +13,7 @@
 
 #include <mimas/mimas.h>
 
-#define MIMAS_WINDOW_CLASS_NAME L"Mimas_Window"
+#define MIMAS_WINDOW_CLASS_NAME L"anton.mimas.mingwlul.window"
 
 typedef struct {
     HWND handle;
