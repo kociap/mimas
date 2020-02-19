@@ -36,6 +36,16 @@ void mimas_set_window_activate_callback(Mimas_Window* window, mimas_window_activ
     window->callbacks.window_activate_data = user_data;
 }
 
+void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data) {
+    window->callbacks.cursor_pos = callback;
+    window->callbacks.cursor_pos_data = user_data;
+}
+
+void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data) {
+    window->callbacks.key = callback;
+    window->callbacks.key_data = user_data;
+}
+
 void mimas_set_window_pos(Mimas_Window* const window, mimas_i32 const x, mimas_i32 const y) {
     mimas_platform_set_window_pos(window, x, y);
 }

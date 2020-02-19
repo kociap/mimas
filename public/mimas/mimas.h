@@ -27,45 +27,53 @@
 
 MIMAS_EXTERN_C_BEGIN
 
-#define MIMAS_KEY_UNKNOWN -1
+typedef enum Mimas_Key {
+    MIMAS_KEY_UNKNOWN = -1,
 
-#define MIMAS_KEY_0 48
-#define MIMAS_KEY_1 49
-#define MIMAS_KEY_2 50
-#define MIMAS_KEY_3 51
-#define MIMAS_KEY_4 52
-#define MIMAS_KEY_5 53
-#define MIMAS_KEY_6 54
-#define MIMAS_KEY_7 55
-#define MIMAS_KEY_8 56
-#define MIMAS_KEY_9 57
+    MIMAS_KEY_0 = 48,
+    MIMAS_KEY_1 = 49,
+    MIMAS_KEY_2 = 50,
+    MIMAS_KEY_3 = 51,
+    MIMAS_KEY_4 = 52,
+    MIMAS_KEY_5 = 53,
+    MIMAS_KEY_6 = 54,
+    MIMAS_KEY_7 = 55,
+    MIMAS_KEY_8 = 56,
+    MIMAS_KEY_9 = 57,
 
-#define MIMAS_KEY_A 65
-#define MIMAS_KEY_B 66
-#define MIMAS_KEY_C 67
-#define MIMAS_KEY_D 68
-#define MIMAS_KEY_E 69
-#define MIMAS_KEY_F 70
-#define MIMAS_KEY_G 71
-#define MIMAS_KEY_H 72
-#define MIMAS_KEY_I 73
-#define MIMAS_KEY_J 74
-#define MIMAS_KEY_K 75
-#define MIMAS_KEY_L 76
-#define MIMAS_KEY_M 77
-#define MIMAS_KEY_N 78
-#define MIMAS_KEY_O 79
-#define MIMAS_KEY_P 80
-#define MIMAS_KEY_Q 81
-#define MIMAS_KEY_R 82
-#define MIMAS_KEY_S 83
-#define MIMAS_KEY_T 84
-#define MIMAS_KEY_U 85
-#define MIMAS_KEY_V 86
-#define MIMAS_KEY_W 87
-#define MIMAS_KEY_X 88
-#define MIMAS_KEY_Y 89
-#define MIMAS_KEY_Z 90
+    MIMAS_KEY_A = 65,
+    MIMAS_KEY_B = 66,
+    MIMAS_KEY_C = 67,
+    MIMAS_KEY_D = 68,
+    MIMAS_KEY_E = 69,
+    MIMAS_KEY_F = 70,
+    MIMAS_KEY_G = 71,
+    MIMAS_KEY_H = 72,
+    MIMAS_KEY_I = 73,
+    MIMAS_KEY_J = 74,
+    MIMAS_KEY_K = 75,
+    MIMAS_KEY_L = 76,
+    MIMAS_KEY_M = 77,
+    MIMAS_KEY_N = 78,
+    MIMAS_KEY_O = 79,
+    MIMAS_KEY_P = 80,
+    MIMAS_KEY_Q = 81,
+    MIMAS_KEY_R = 82,
+    MIMAS_KEY_S = 83,
+    MIMAS_KEY_T = 84,
+    MIMAS_KEY_U = 85,
+    MIMAS_KEY_V = 86,
+    MIMAS_KEY_W = 87,
+    MIMAS_KEY_X = 88,
+    MIMAS_KEY_Y = 89,
+    MIMAS_KEY_Z = 90,
+} Mimas_Key;
+
+typedef enum Mimas_Key_Action {
+    MIMAS_KEY_RELEASE,
+    MIMAS_KEY_PRESS,
+    MIMAS_KEY_REPEAT,
+} Mimas_Key_Action;
 
 typedef int mimas_bool;
 #define mimas_true 1
@@ -102,9 +110,20 @@ typedef struct Mimas_Window_Create_Info {
 MIMAS_API Mimas_Window* mimas_create_window(Mimas_Window_Create_Info);
 MIMAS_API void mimas_destroy_window(Mimas_Window* window);
 
+/*
+ * activated parameter is 1 if activated, 0 if deactivated.
+ */
 typedef void(*mimas_window_activate_callback)(Mimas_Window* window, mimas_i32 activated, void* user_data);
-// activated parameter is 1 if activated, 0 if deactivated.
 MIMAS_API void mimas_set_window_activate_callback(Mimas_Window* window, mimas_window_activate_callback callback, void* user_data);
+
+/*
+ * x and y are the screen coordinates of the cursor.
+ */
+typedef void(*mimas_window_cursor_pos_callback)(Mimas_Window* window, mimas_i32 x, mimas_i32 y, void* user_data);
+MIMAS_API void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data);
+
+typedef void(* mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, Mimas_Key_Action state, void* user_data);
+MIMAS_API void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data);
 
 MIMAS_API void mimas_set_window_pos(Mimas_Window* window, mimas_i32 x, mimas_i32 y);
 MIMAS_API void mimas_get_window_pos(Mimas_Window* window, mimas_i32* x, mimas_i32* y);

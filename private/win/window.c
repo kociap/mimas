@@ -3,6 +3,7 @@
 #include <platform.h>
 #include <internal.h>
 #include <win/wgl.h>
+#include <utils.h>
 
 #include <wingdi.h>
 
@@ -105,6 +106,71 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                 GetWindowRect(hwnd, &window_rect);
                 return window_hit_test(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), window_rect);
             }
+        } break;
+
+        case WM_SETFOCUS: {
+            if(window->cursor_mode == MIMAS_CURSOR_CAPTURED) {
+                capture_cursor(window);
+            } else if(window->cursor_mode == MIMAS_CURSOR_VIRTUAL) {
+                enable_virtual_cursor(window);
+            }
+
+            if(window->callbacks.window_activate) {
+                window->callbacks.window_activate(window, mimas_true, window->callbacks.window_activate_data);
+            }
+        } break;
+
+        case WM_KILLFOCUS: {
+            if(window->cursor_mode == MIMAS_CURSOR_CAPTURED) {
+                release_captured_cursor();
+            } else if(window->cursor_mode == MIMAS_CURSOR_VIRTUAL) {
+                disable_virtual_cursor(window);
+            }
+
+            if(window->callbacks.key) {
+                for(mimas_u32 i = 0; i < ARRAY_SIZE(window->keys); ++i) {
+                    if(window->keys[i] != MIMAS_KEY_RELEASE) {
+                        window->keys[i] = MIMAS_KEY_RELEASE;
+                        window->callbacks.key(window, i, MIMAS_KEY_RELEASE, window->callbacks.key_data);
+                    }
+                }
+            }
+
+            if(window->callbacks.window_activate) {
+                window->callbacks.window_activate(window, mimas_false, window->callbacks.window_activate_data);
+            }
+        } break;
+
+        case WM_KEYUP:
+        case WM_KEYDOWN: {
+            Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
+            Mimas_Key const key = platform->keys[wparam];
+            mimas_bool const key_was_up = lparam & 0x80000000;
+            Mimas_Key_Action action;
+            if(key_was_up && msg == WM_KEYDOWN) {
+                action = MIMAS_KEY_PRESS;
+            } else if(msg == WM_KEYDOWN) {
+                action = MIMAS_KEY_REPEAT;
+            } else {
+                action = MIMAS_KEY_RELEASE;
+            }
+
+            window->keys[key] = action;
+
+            if(window->callbacks.key) {
+                window->callbacks.key(window, key, action, window->callbacks.key_data);
+            }
+        } break;
+
+        case WM_MOUSEMOVE: {
+            mimas_i32 const x = GET_X_LPARAM(lparam);
+            mimas_i32 const y = GET_Y_LPARAM(lparam);
+
+            if(window->callbacks.cursor_pos) {
+                window->callbacks.cursor_pos(window, x, y, window->callbacks.cursor_pos_data);
+            }
+
+            return 0;
         } break;
     }
 

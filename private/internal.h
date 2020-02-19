@@ -24,10 +24,15 @@ struct Mimas_Window {
     mimas_bool decorated;
     Mimas_Cursor_Mode cursor_mode;
     void* native_window;
+    Mimas_Key_Action keys[256];
 
     struct {
         mimas_window_activate_callback window_activate;
         void* window_activate_data;
+        mimas_window_cursor_pos_callback cursor_pos;
+        void* cursor_pos_data;
+        mimas_window_key_callback key;
+        void* key_data;
     } callbacks;
 };
 
