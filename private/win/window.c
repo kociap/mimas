@@ -412,7 +412,7 @@ mimas_bool mimas_platform_init() {
     return mimas_true;
 }
 
-void mimas_platform_terminate_with_gl() {
+void mimas_platform_terminate() {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     if(_mimas->backend == MIMAS_BACKEND_GL) {
         mimas_platform_terminate_with_gl();
