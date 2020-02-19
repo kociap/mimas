@@ -212,6 +212,11 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
             return 0;
         } break;
+
+        case WM_CLOSE: {
+            window->close_requested = mimas_true;
+            return 0;
+        } break;
     }
 
     return DefWindowProc(hwnd, msg, wparam, lparam);

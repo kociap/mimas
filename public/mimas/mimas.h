@@ -97,7 +97,7 @@ typedef enum Mimas_Key {
     MIMAS_KEY_SPACE,
     MIMAS_KEY_ENTER,
     MIMAS_KEY_ESCAPE,
-    
+
     MIMAS_KEY_NUMPAD_ENTER,
 } Mimas_Key;
 
@@ -152,6 +152,7 @@ typedef struct Mimas_Window_Create_Info {
 
 MIMAS_API Mimas_Window* mimas_create_window(Mimas_Window_Create_Info);
 MIMAS_API void mimas_destroy_window(Mimas_Window* window);
+MIMAS_API mimas_bool mimas_close_requested(Mimas_Window* window);
 
 /*
  * activated parameter is 1 if activated, 0 if deactivated.
@@ -183,10 +184,6 @@ MIMAS_API void mimas_hide_window(Mimas_Window* window);
 MIMAS_API void mimas_restore_window(Mimas_Window* window);
 MIMAS_API void mimas_minimize_window(Mimas_Window* window);
 MIMAS_API void mimas_maximize_window(Mimas_Window* window);
-
-MIMAS_API void mimas_swap_buffers(Mimas_Window* window);
-MIMAS_API void mimas_set_swap_interval(mimas_i32);
-MIMAS_API mimas_i32 mimas_get_swap_interval();
 
 MIMAS_API void mimas_set_cursor_mode(Mimas_Window* window, Mimas_Cursor_Mode);
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);

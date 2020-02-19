@@ -22,6 +22,7 @@ Mimas_Internal* _mimas_get_mimas_internal();
 // typedef in mimas/mimas.h
 struct Mimas_Window {
     mimas_bool decorated;
+    mimas_bool close_requested;
     Mimas_Cursor_Mode cursor_mode;
     void* native_window;
     Mimas_Key_Action keys[256];
