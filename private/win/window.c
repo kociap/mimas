@@ -2,8 +2,9 @@
 
 #include <platform.h>
 #include <internal.h>
-#include <win/wgl.h>
 #include <utils.h>
+#include <platform_gl.h>
+#include <platform_vk.h>
 
 #include <wingdi.h>
 
@@ -253,27 +254,30 @@ static Mimas_Window* create_native_window(Mimas_Window_Create_Info const info) {
         // TODO: Error
         return NULL;
     }
-
-    HDC const hdc = GetDC(hwnd);
-    PIXELFORMATDESCRIPTOR pfd = {
-        .nSize = sizeof(PIXELFORMATDESCRIPTOR),
-        .nVersion = 1,
-        .dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-        .iPixelType = PFD_TYPE_RGBA,
-        .cColorBits = 24,
-        .cRedBits = 8,
-        .cGreenBits = 8,
-        .cBlueBits = 8,
-        .cAlphaBits = 8,
-        .cDepthBits = 24,
-        .cStencilBits = 8,
-    };
-    int const pixf = ChoosePixelFormat(hdc, &pfd);
-    if(!SetPixelFormat(hdc, pixf, &pfd)) {
-        DestroyWindow(hwnd);
-        free(window);
-        // TODO: Error
-        return NULL;
+    
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    if(_mimas->backend == MIMAS_BACKEND_GL) {
+        HDC const hdc = GetDC(hwnd);
+        PIXELFORMATDESCRIPTOR pfd = {
+            .nSize = sizeof(PIXELFORMATDESCRIPTOR),
+            .nVersion = 1,
+            .dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+            .iPixelType = PFD_TYPE_RGBA,
+            .cColorBits = 24,
+            .cRedBits = 8,
+            .cGreenBits = 8,
+            .cBlueBits = 8,
+            .cAlphaBits = 8,
+            .cDepthBits = 24,
+            .cStencilBits = 8,
+        };
+        int const pixf = ChoosePixelFormat(hdc, &pfd);
+        if(!SetPixelFormat(hdc, pixf, &pfd)) {
+            DestroyWindow(hwnd);
+            free(window);
+            // TODO: Error
+            return NULL;
+        }
     }
 
     Mimas_Win_Window* native_window = (Mimas_Win_Window*)malloc(sizeof(Mimas_Win_Window));
@@ -298,7 +302,7 @@ static void destroy_native_window(Mimas_Window* const window) {
     free(window);
 }
 
-mimas_bool mimas_platform_init_with_gl() {
+mimas_bool mimas_platform_init() {
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)malloc(sizeof(Mimas_Win_Platform));
     memset(platform, 0, sizeof(Mimas_Win_Platform));
     memset(platform->keys, -1, sizeof(platform->keys));
@@ -363,48 +367,61 @@ mimas_bool mimas_platform_init_with_gl() {
         return mimas_false;
     }
 
-    Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
-    if(!dummy_window) {
-        unregister_window_class();
-        free(platform);
-        // TODO: Error
-        return mimas_false;
-    }
-
-    HWND const dummy_hwnd = ((Mimas_Win_Window*)dummy_window->native_window)->handle;
-    // If the program is launched with STARTUPINFO, the first call to ShowWindow will ignore the nCmdShow param,
-    //   therefore we call it here to clear that behaviour...
-    ShowWindow(dummy_hwnd, SW_HIDE);
-    // ... and call it again to make sure it's hidden.
-    ShowWindow(dummy_hwnd, SW_HIDE);
-
-    MSG msg;
-    while (PeekMessageW(&msg, dummy_hwnd, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&msg);
-        DispatchMessageW(&msg);
-    }
-
-    if(!mimas_load_wgl(GetDC(dummy_hwnd))) {
-        destroy_native_window(dummy_window);
-        unregister_window_class();
-        free(platform);
-        // TODO: Error
-        return mimas_false;
-    }
-
-    platform->dummy_window = dummy_window;
-
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    _mimas->platform = platform;
+    if(_mimas->backend == MIMAS_BACKEND_GL) {
+        Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
+        if(!dummy_window) {
+            unregister_window_class();
+            free(platform);
+            // TODO: Error
+            return mimas_false;
+        }
+
+        HWND const dummy_hwnd = ((Mimas_Win_Window*)dummy_window->native_window)->handle;
+        // If the program is launched with STARTUPINFO, the first call to ShowWindow will ignore the nCmdShow param,
+        //   therefore we call it here to clear that behaviour...
+        ShowWindow(dummy_hwnd, SW_HIDE);
+        // ... and call it again to make sure it's hidden.
+        ShowWindow(dummy_hwnd, SW_HIDE);
+
+        MSG msg;
+        while (PeekMessageW(&msg, dummy_hwnd, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+
+        platform->dummy_window = dummy_window;
+
+        Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+        _mimas->platform = platform;
+
+        if(!mimas_platform_init_with_gl()) {
+            destroy_native_window(dummy_window);
+            unregister_window_class();
+            free(platform);
+            return mimas_false;
+        }
+    } else {
+        if(!mimas_platform_init_with_vk()) {
+            unregister_window_class();
+            free(platform);
+            return mimas_false;
+        }
+    }
 
     return mimas_true;
 }
 
 void mimas_platform_terminate_with_gl() {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    if(_mimas->backend == MIMAS_BACKEND_GL) {
+        mimas_platform_terminate_with_gl();
+    } else {
+        mimas_platform_terminate_with_vk();
+    }
+
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas->platform;
     destroy_native_window(platform->dummy_window);
-    mimas_unload_wgl();
     unregister_window_class();
     free(platform);
     _mimas->platform = NULL;
@@ -505,20 +522,6 @@ void mimas_platform_minimize_window(Mimas_Window* const window) {
 void mimas_platform_maximize_window(Mimas_Window* const window) {
     Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
     ShowWindow(native_window->handle, SW_MAXIMIZE);
-}
-
-void mimas_platform_swap_buffers(Mimas_Window* const window) {
-    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
-    HDC const hdc = GetDC(native_window->handle);
-    wglSwapBuffers(hdc);
-}
-
-void mimas_platform_set_swap_interval(mimas_i32 const interval) {
-    wglSwapIntervalEXT(interval);
-}
-
-mimas_i32 mimas_platform_get_swap_interval() {
-    return wglGetSwapIntervalEXT();
 }
 
 // TODO: Move to input.c

@@ -5,6 +5,20 @@
 
 #include <wingdi.h>
 
+mimas_bool mimas_platform_init_with_gl() {
+    Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
+    Mimas_Win_Window* const dummy_window = (Mimas_Win_Window*)platform->dummy_window->native_window;
+    if(!mimas_load_wgl(GetDC(dummy_window->handle))) {
+        // TODO: Error
+        return mimas_false;
+    }
+    return mimas_true;
+}
+
+void mimas_platform_terminate_with_gl() {
+    mimas_unload_wgl();
+}
+
 Mimas_GL_Context* mimas_platform_create_gl_context(mimas_i32 const major, mimas_i32 const minor, Mimas_GL_Profile const profile) {
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
     Mimas_Win_Window* const native_window = (Mimas_Win_Window*)platform->dummy_window->native_window;
@@ -29,4 +43,18 @@ mimas_bool mimas_platform_make_context_current(Mimas_Window* const window, Mimas
     }
 
     return mimas_true;
+}
+
+void mimas_platform_swap_buffers(Mimas_Window* const window) {
+    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+    HDC const hdc = GetDC(native_window->handle);
+    wglSwapBuffers(hdc);
+}
+
+void mimas_platform_set_swap_interval(mimas_i32 const interval) {
+    wglSwapIntervalEXT(interval);
+}
+
+mimas_i32 mimas_platform_get_swap_interval() {
+    return wglGetSwapIntervalEXT();
 }

@@ -6,16 +6,7 @@
 #include <platform_vk.h>
 
 void mimas_terminate() {
-    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    switch(_mimas->backend) {
-        case MIMAS_BACKEND_GL: {
-            mimas_platform_terminate_with_gl();
-        } break;
-
-        case MIMAS_BACKEND_VK: {
-            mimas_platform_terminate_with_vk();
-        } break;
-    }
+    mimas_platform_terminate();
     _mimas_terminate_internal();
 }
 

@@ -1,10 +1,11 @@
 #include <mimas/mimas_gl.h>
 #include <internal.h>
 #include <platform_vk.h>
+#include <platform.h>
 
 mimas_bool mimas_init_with_vk() {
     _mimas_init_internal(MIMAS_BACKEND_VK);
-    mimas_bool const res =  mimas_platform_init_with_vk();
+    mimas_bool const res =  mimas_platform_init();
     if(!res) {
         _mimas_terminate_internal();
     }
