@@ -33,6 +33,7 @@ struct Mimas_Window {
         void* cursor_pos_data;
         mimas_window_key_callback key;
         void* key_data;
+        mimas_window_hittest hittest;
     } callbacks;
 };
 

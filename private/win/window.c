@@ -24,11 +24,11 @@ static mimas_u32 get_window_extended_styles(Mimas_Window const* const window) {
 //
 static void capture_cursor(Mimas_Window* const window) {
     Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
-    RECT clientRect;
-    GetClientRect(native_window->handle, &clientRect);
-    ClientToScreen(native_window->handle, (POINT*)&clientRect.left);
-    ClientToScreen(native_window->handle, (POINT*)&clientRect.right);
-    ClipCursor(&clientRect);
+    RECT client;
+    GetClientRect(native_window->handle, &client);
+    ClientToScreen(native_window->handle, (POINT*)&client.left);
+    ClientToScreen(native_window->handle, (POINT*)&client.right);
+    ClipCursor(&client);
 }
 
 static void release_captured_cursor() {
@@ -57,7 +57,6 @@ static mimas_i32 window_hit_test(mimas_i32 const cursor_x, mimas_i32 const curso
     mimas_i32 const border_width = 8;
 
     mimas_u32 result = 0;
-    // printf("Hittest cursor: %d %d\n", cursor_x, cursor_y);
     result |= left * (cursor_x < window_rect.left + border_width);
     result |= right * (cursor_x >= window_rect.right - border_width);
     result |= top * (cursor_y < window_rect.top + border_width);
@@ -72,7 +71,7 @@ static mimas_i32 window_hit_test(mimas_i32 const cursor_x, mimas_i32 const curso
         case top | right   : return HTTOPRIGHT;
         case bottom | left : return HTBOTTOMLEFT;
         case bottom | right: return HTBOTTOMRIGHT;
-        case client        : return HTCAPTION;
+        case client        : return HTCLIENT;
         default            : return HTNOWHERE;
     }
 }
@@ -101,9 +100,34 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
         } break;
 
         case WM_NCHITTEST: {
-            if(!window->decorated) {
-                RECT window_rect;
-                GetWindowRect(hwnd, &window_rect);
+            RECT window_rect;
+            GetWindowRect(hwnd, &window_rect);
+            RECT client_rect;
+            GetClientRect(hwnd, &client_rect);
+            ClientToScreen(hwnd, (POINT*)&client_rect.left);
+            ClientToScreen(hwnd, (POINT*)&client_rect.right);
+            if(window->callbacks.hittest) {
+                Mimas_Rect const _window_rect = {window_rect.left, window_rect.top, window_rect.bottom, window_rect.right};
+                Mimas_Rect const _client_rect = {client_rect.left, client_rect.top, client_rect.bottom, client_rect.right};
+                Mimas_Hittest_Result const r = window->callbacks.hittest(window, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), _window_rect, _client_rect);
+                mimas_i32 const hit[] = {
+                    [MIMAS_HITTEST_TOP] = HTTOP,
+                    [MIMAS_HITTEST_BOTTOM] = HTBOTTOM,
+                    [MIMAS_HITTEST_LEFT] = HTLEFT,
+                    [MIMAS_HITTEST_RIGHT] = HTRIGHT,
+                    [MIMAS_HITTEST_TOP_LEFT] = HTTOPLEFT,
+                    [MIMAS_HITTEST_TOP_RIGHT] = HTTOPRIGHT,
+                    [MIMAS_HITTEST_BOTTOM_LEFT] = HTBOTTOMLEFT,
+                    [MIMAS_HITTEST_BOTTOM_RIGHT] = HTBOTTOMRIGHT,
+                    [MIMAS_HITTEST_CLIENT] = HTCLIENT,
+                    [MIMAS_HITTEST_TITLEBAR] = HTCAPTION,
+                    [MIMAS_HITTEST_MINIMIZE] = HTMINBUTTON,
+                    [MIMAS_HITTEST_MAXIMIZE] = HTMAXBUTTON,
+                    [MIMAS_HITTEST_CLOSE] = HTCLOSE,
+                    [MIMAS_HITTEST_NOWHERE] = HTNOWHERE,
+                };
+                return hit[r];
+            } else if(!window->decorated) {
                 return window_hit_test(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), window_rect);
             }
         } break;

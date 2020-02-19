@@ -46,6 +46,10 @@ void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callba
     window->callbacks.key_data = user_data;
 }
 
+void mimas_set_window_hittest(Mimas_Window* window, mimas_window_hittest callback) {
+    window->callbacks.hittest = callback;
+}
+
 void mimas_set_window_pos(Mimas_Window* const window, mimas_i32 const x, mimas_i32 const y) {
     mimas_platform_set_window_pos(window, x, y);
 }

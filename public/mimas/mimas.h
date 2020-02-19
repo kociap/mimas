@@ -27,6 +27,19 @@
 
 MIMAS_EXTERN_C_BEGIN
 
+typedef int mimas_bool;
+#define mimas_true 1
+#define mimas_false 0
+
+typedef char mimas_i8;
+typedef unsigned char mimas_u8;
+typedef short mimas_i16;
+typedef unsigned short mimas_u16;
+typedef int mimas_i32;
+typedef unsigned int mimas_u32;
+typedef long long mimas_i64;
+typedef unsigned long long mimas_u64;
+
 typedef enum Mimas_Key {
     MIMAS_KEY_UNKNOWN = -1,
 
@@ -75,24 +88,35 @@ typedef enum Mimas_Key_Action {
     MIMAS_KEY_REPEAT,
 } Mimas_Key_Action;
 
-typedef int mimas_bool;
-#define mimas_true 1
-#define mimas_false 0
-
-typedef char mimas_i8;
-typedef unsigned char mimas_u8;
-typedef short mimas_i16;
-typedef unsigned short mimas_u16;
-typedef int mimas_i32;
-typedef unsigned int mimas_u32;
-typedef long long mimas_i64;
-typedef unsigned long long mimas_u64;
+typedef enum Mimas_Hittest_Result {
+    MIMAS_HITTEST_TOP,
+    MIMAS_HITTEST_BOTTOM,
+    MIMAS_HITTEST_LEFT,
+    MIMAS_HITTEST_RIGHT,
+    MIMAS_HITTEST_TOP_LEFT,
+    MIMAS_HITTEST_TOP_RIGHT,
+    MIMAS_HITTEST_BOTTOM_LEFT,
+    MIMAS_HITTEST_BOTTOM_RIGHT,
+    MIMAS_HITTEST_CLIENT,
+    MIMAS_HITTEST_TITLEBAR,
+    MIMAS_HITTEST_MINIMIZE,
+    MIMAS_HITTEST_MAXIMIZE,
+    MIMAS_HITTEST_CLOSE,
+    MIMAS_HITTEST_NOWHERE,
+} Mimas_Hittest_Result;
 
 typedef enum Mimas_Cursor_Mode {
     MIMAS_CURSOR_NORMAL,
     MIMAS_CURSOR_CAPTURED,
     MIMAS_CURSOR_VIRTUAL,
 } Mimas_Cursor_Mode;
+
+typedef struct Mimas_Rect {
+    mimas_i32 left;
+    mimas_i32 top;
+    mimas_i32 bottom;
+    mimas_i32 right;
+} Mimas_Rect;
 
 typedef struct Mimas_Window Mimas_Window;
 
@@ -113,17 +137,20 @@ MIMAS_API void mimas_destroy_window(Mimas_Window* window);
 /*
  * activated parameter is 1 if activated, 0 if deactivated.
  */
-typedef void(*mimas_window_activate_callback)(Mimas_Window* window, mimas_i32 activated, void* user_data);
+typedef void (*mimas_window_activate_callback)(Mimas_Window* window, mimas_i32 activated, void* user_data);
 MIMAS_API void mimas_set_window_activate_callback(Mimas_Window* window, mimas_window_activate_callback callback, void* user_data);
 
 /*
  * x and y are the screen coordinates of the cursor.
  */
-typedef void(*mimas_window_cursor_pos_callback)(Mimas_Window* window, mimas_i32 x, mimas_i32 y, void* user_data);
+typedef void (*mimas_window_cursor_pos_callback)(Mimas_Window* window, mimas_i32 x, mimas_i32 y, void* user_data);
 MIMAS_API void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data);
 
-typedef void(* mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, Mimas_Key_Action state, void* user_data);
+typedef void (*mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, Mimas_Key_Action state, void* user_data);
 MIMAS_API void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data);
+
+typedef Mimas_Hittest_Result (*mimas_window_hittest)(Mimas_Window* window, mimas_i32 cursor_x, mimas_i32 cursor_y, Mimas_Rect window_rect, Mimas_Rect client_rect);
+MIMAS_API void mimas_set_window_hittest(Mimas_Window* window, mimas_window_hittest callback);
 
 MIMAS_API void mimas_set_window_pos(Mimas_Window* window, mimas_i32 x, mimas_i32 y);
 MIMAS_API void mimas_get_window_pos(Mimas_Window* window, mimas_i32* x, mimas_i32* y);
