@@ -41,7 +41,7 @@ static void enable_virtual_cursor(Mimas_Window* const window) {
 }
 
 static void disable_virtual_cursor(Mimas_Window* const window) {
-    release_captured_cursor(window);
+    release_captured_cursor();
 }
 
 static mimas_i32 window_hit_test(mimas_i32 const cursor_x, mimas_i32 const cursor_y, RECT const window_rect) {
