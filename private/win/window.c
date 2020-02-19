@@ -24,9 +24,9 @@ static mimas_u32 get_window_extended_styles(Mimas_Window const* const window) {
 static void capture_cursor(Mimas_Window* const window) {
     Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
     RECT clientRect;
-    GetClientRect(native_window, &clientRect);
-    ClientToScreen(native_window, (POINT*)&clientRect.left);
-    ClientToScreen(native_window, (POINT*)&clientRect.right);
+    GetClientRect(native_window->handle, &clientRect);
+    ClientToScreen(native_window->handle, (POINT*)&clientRect.left);
+    ClientToScreen(native_window->handle, (POINT*)&clientRect.right);
     ClipCursor(&clientRect);
 }
 
