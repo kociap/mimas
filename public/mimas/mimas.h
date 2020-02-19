@@ -80,6 +80,25 @@ typedef enum Mimas_Key {
     MIMAS_KEY_X = 88,
     MIMAS_KEY_Y = 89,
     MIMAS_KEY_Z = 90,
+
+    MIMAS_KEY_LEFT,
+    MIMAS_KEY_RIGHT,
+    MIMAS_KEY_UP,
+    MIMAS_KEY_DOWN,
+
+    MIMAS_KEY_TAB,
+    MIMAS_KEY_PAGE_UP,
+    MIMAS_KEY_PAGE_DOWN,
+    MIMAS_KEY_HOME,
+    MIMAS_KEY_END,
+    MIMAS_KEY_INSERT,
+    MIMAS_KEY_DELETE,
+    MIMAS_KEY_BACKSPACE,
+    MIMAS_KEY_SPACE,
+    MIMAS_KEY_ENTER,
+    MIMAS_KEY_ESCAPE,
+    
+    MIMAS_KEY_NUMPAD_ENTER,
 } Mimas_Key;
 
 typedef enum Mimas_Key_Action {

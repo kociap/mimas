@@ -76,6 +76,21 @@ static mimas_i32 window_hit_test(mimas_i32 const cursor_x, mimas_i32 const curso
     }
 }
 
+static Mimas_Key translate_key(mimas_u32 const vk, mimas_bool const extended) {
+    Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
+    Mimas_Key const key = platform->keys[vk];
+    if(extended) {
+        switch(key) {
+            case MIMAS_KEY_ENTER: 
+                return MIMAS_KEY_NUMPAD_ENTER;
+            default:
+                return key;
+        }
+    } else {
+        return key;
+    }
+}
+
 static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam, LPARAM const lparam) {
     Mimas_Window* const window = GetPropW(hwnd, L"Mimas_Window");
     switch(msg) {
@@ -167,9 +182,9 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
         case WM_KEYUP:
         case WM_KEYDOWN: {
-            Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
-            Mimas_Key const key = platform->keys[wparam];
+            mimas_bool const extended = lparam & 0x800000;
             mimas_bool const key_was_up = lparam & 0x80000000;
+            Mimas_Key const key = translate_key(wparam, extended);
             Mimas_Key_Action action;
             if(key_was_up && msg == WM_KEYDOWN) {
                 action = MIMAS_KEY_PRESS;
@@ -325,6 +340,23 @@ mimas_bool mimas_platform_init_with_gl() {
     platform->keys[0x58] = MIMAS_KEY_X;
     platform->keys[0x59] = MIMAS_KEY_Y;
     platform->keys[0x5A] = MIMAS_KEY_Z;
+
+    platform->keys[VK_UP] = MIMAS_KEY_UP;
+    platform->keys[VK_DOWN] = MIMAS_KEY_DOWN;
+    platform->keys[VK_LEFT] = MIMAS_KEY_LEFT;
+    platform->keys[VK_RIGHT] = MIMAS_KEY_RIGHT;
+
+    platform->keys[VK_TAB] = MIMAS_KEY_TAB;
+    platform->keys[VK_PRIOR] = MIMAS_KEY_PAGE_UP;
+    platform->keys[VK_NEXT] = MIMAS_KEY_PAGE_DOWN;
+    platform->keys[VK_HOME] = MIMAS_KEY_HOME;
+    platform->keys[VK_END] = MIMAS_KEY_END;
+    platform->keys[VK_INSERT] = MIMAS_KEY_INSERT;
+    platform->keys[VK_DELETE] = MIMAS_KEY_DELETE;
+    platform->keys[VK_BACK] = MIMAS_KEY_BACKSPACE;
+    platform->keys[VK_SPACE] = MIMAS_KEY_SPACE;
+    platform->keys[VK_RETURN] = MIMAS_KEY_ENTER;
+    platform->keys[VK_ESCAPE] = MIMAS_KEY_ESCAPE;
 
     mimas_bool const register_res = register_window_class();
     if(!register_res) {
