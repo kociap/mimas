@@ -398,11 +398,13 @@ mimas_bool mimas_platform_init() {
     }
 
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    _mimas->platform = platform;
     if(_mimas->backend == MIMAS_BACKEND_GL) {
          Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
         if(!dummy_window) {
             unregister_window_class();
             free(platform);
+            _mimas->platform = NULL;
             // TODO: Error
             return mimas_false;
         }
@@ -425,17 +427,18 @@ mimas_bool mimas_platform_init() {
             destroy_native_window(dummy_window);
             unregister_window_class();
             free(platform);
+            _mimas->platform = NULL;
             return mimas_false;
         }
     } else {
         if(!mimas_platform_init_vk_backend()) {
             unregister_window_class();
             free(platform);
+            _mimas->platform = NULL;
             return mimas_false;
         }
     }
 
-    _mimas->platform = platform;
 
     return mimas_true;
 }
