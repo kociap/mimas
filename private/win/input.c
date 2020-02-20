@@ -8,3 +8,8 @@ void mimas_platform_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
     *x = cursor.x;
     *y = cursor.y;
 }
+
+mimas_u8 mimas_platform_get_mouse_button(Mimas_Mouse_Button button) {
+    Mimas_Win_Platform const* platform = (Mimas_Win_Platform const*)_mimas_get_mimas_internal()->platform;
+    return platform->mouse_state[button];
+}  

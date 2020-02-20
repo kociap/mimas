@@ -215,6 +215,7 @@ MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 
 MIMAS_API void mimas_set_cursor_mode(Mimas_Window* window, Mimas_Cursor_Mode);
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
+MIMAS_API mimas_u8 mimas_get_mouse_button(Mimas_Mouse_Button button);
 
 MIMAS_EXTERN_C_END
 

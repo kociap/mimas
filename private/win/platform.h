@@ -21,6 +21,7 @@ typedef struct {
 
 typedef struct {
     mimas_u8 keyboard_state[256];
+    mimas_u8 mouse_state[3];
     mimas_i32 virtaul_keys[256];
     Mimas_Key keys[256];
     Mimas_Window* dummy_window;
