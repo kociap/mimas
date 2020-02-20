@@ -397,9 +397,8 @@ mimas_bool mimas_platform_init() {
         return mimas_false;
     }
 
-    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     if(_mimas->backend == MIMAS_BACKEND_GL) {
-        Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
+         Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
         if(!dummy_window) {
             unregister_window_class();
             free(platform);
@@ -421,10 +420,6 @@ mimas_bool mimas_platform_init() {
         }
 
         platform->dummy_window = dummy_window;
-
-        Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-        _mimas->platform = platform;
-
         if(!mimas_platform_init_gl_backend()) {
             destroy_native_window(dummy_window);
             unregister_window_class();
@@ -438,6 +433,9 @@ mimas_bool mimas_platform_init() {
             return mimas_false;
         }
     }
+
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    _mimas->platform = platform;
 
     return mimas_true;
 }
