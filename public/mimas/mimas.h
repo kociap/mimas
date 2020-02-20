@@ -186,7 +186,7 @@ MIMAS_API void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_
 MIMAS_API Mimas_Callback mimas_get_cursor_pos_callback(Mimas_Window* window);
 
 typedef void(*mimas_window_mouse_button_callback)(Mimas_Window* window, Mimas_Mouse_Button button, Mimas_Mouse_Button_Action action, void* user_data);
-MIMAS_API void mimas_set_window_mouse_button_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data);
+MIMAS_API void mimas_set_window_mouse_button_callback(Mimas_Window* window, mimas_window_mouse_button_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_mouse_button_callback(Mimas_Window* window);
 
 typedef void (*mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, Mimas_Key_Action action, void* user_data);
