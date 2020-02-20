@@ -285,8 +285,8 @@ static Mimas_Window* create_native_window(Mimas_Window_Create_Info const info) {
     }
     
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    HDC const hdc = GetDC(hwnd);
     if(_mimas->backend == MIMAS_BACKEND_GL) {
-        HDC const hdc = GetDC(hwnd);
         PIXELFORMATDESCRIPTOR pfd = {
             .nSize = sizeof(PIXELFORMATDESCRIPTOR),
             .nVersion = 1,
@@ -311,6 +311,7 @@ static Mimas_Window* create_native_window(Mimas_Window_Create_Info const info) {
 
     Mimas_Win_Window* native_window = (Mimas_Win_Window*)malloc(sizeof(Mimas_Win_Window));
     native_window->handle = hwnd;
+    native_window->hdc = hdc;
     window->native_window = native_window;
 
     SetProp(hwnd, L"Mimas_Window", (HANDLE)window);

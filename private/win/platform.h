@@ -17,6 +17,7 @@
 
 typedef struct {
     HWND handle;
+    HDC hdc;
 } Mimas_Win_Window;
 
 typedef struct {
