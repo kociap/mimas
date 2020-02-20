@@ -397,33 +397,29 @@ mimas_bool mimas_platform_init() {
         return mimas_false;
     }
 
-    Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
-    if(!dummy_window) {
-        unregister_window_class();
-        free(platform);
-        // TODO: Error
-        return mimas_false;
-    }
-
-    HWND const dummy_hwnd = ((Mimas_Win_Window*)dummy_window->native_window)->handle;
-    // If the program is launched with STARTUPINFO, the first call to ShowWindow will ignore the nCmdShow param,
-    //   therefore we call it here to clear that behaviour...
-    ShowWindow(dummy_hwnd, SW_HIDE);
-    // ... and call it again to make sure it's hidden.
-    ShowWindow(dummy_hwnd, SW_HIDE);
-
-    MSG msg;
-    while (PeekMessageW(&msg, dummy_hwnd, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&msg);
-        DispatchMessageW(&msg);
-    }
-
-    platform->dummy_window = dummy_window;
-
-    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    _mimas->platform = platform;
-
     if(_mimas->backend == MIMAS_BACKEND_GL) {
+         Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
+        if(!dummy_window) {
+            unregister_window_class();
+            free(platform);
+            // TODO: Error
+            return mimas_false;
+        }
+
+        HWND const dummy_hwnd = ((Mimas_Win_Window*)dummy_window->native_window)->handle;
+        // If the program is launched with STARTUPINFO, the first call to ShowWindow will ignore the nCmdShow param,
+        //   therefore we call it here to clear that behaviour...
+        ShowWindow(dummy_hwnd, SW_HIDE);
+        // ... and call it again to make sure it's hidden.
+        ShowWindow(dummy_hwnd, SW_HIDE);
+
+        MSG msg;
+        while (PeekMessageW(&msg, dummy_hwnd, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+
+        platform->dummy_window = dummy_window;
         if(!mimas_platform_init_gl_backend()) {
             destroy_native_window(dummy_window);
             unregister_window_class();
@@ -437,6 +433,9 @@ mimas_bool mimas_platform_init() {
             return mimas_false;
         }
     }
+
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    _mimas->platform = platform;
 
     return mimas_true;
 }
