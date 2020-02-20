@@ -396,6 +396,7 @@ mimas_bool mimas_platform_init() {
     if(!register_res) {
         return mimas_false;
     }
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
 
     if(_mimas->backend == MIMAS_BACKEND_GL) {
          Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
@@ -434,7 +435,6 @@ mimas_bool mimas_platform_init() {
         }
     }
 
-    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     _mimas->platform = platform;
 
     return mimas_true;
