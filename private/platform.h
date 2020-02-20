@@ -31,6 +31,6 @@ mimas_i32 mimas_platform_get_swap_interval();
 
 void mimas_platform_set_cursor_mode(Mimas_Window*, Mimas_Cursor_Mode);
 void mimas_platform_get_cursor_pos(mimas_i32* x, mimas_i32* y);
-mimas_u8 mimas_platform_get_mouse_button(Mimas_Mouse_Button button);
+Mimas_Mouse_Button_Action mimas_platform_get_mouse_button(Mimas_Mouse_Button button);
 
 #endif // !MIMAS_MIMAS_PLATFORM_H_INCLUDE

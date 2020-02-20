@@ -9,7 +9,7 @@ void mimas_platform_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
     *y = cursor.y;
 }
 
-mimas_u8 mimas_platform_get_mouse_button(Mimas_Mouse_Button button) {
+Mimas_Mouse_Button_Action mimas_platform_get_mouse_button(Mimas_Mouse_Button button) {
     Mimas_Win_Platform const* platform = (Mimas_Win_Platform const*)_mimas_get_mimas_internal()->platform;
-    return platform->mouse_state[button];
+    return platform->mouse_state[button] ? MIMAS_MOUSE_BUTTON_PRESS : MIMAS_MOUSE_BUTTON_RELEASE;
 }  
