@@ -216,6 +216,10 @@ MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 MIMAS_API void mimas_set_cursor_mode(Mimas_Window* window, Mimas_Cursor_Mode);
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 
+// Note that this function only ever returns MIMAS_MOUSE_BUTTON_PRESS or MIMAS_MOUSE_BUTTON_RELEASE 
+// to indicate that the mouse button is currently down or not
+MIMAS_API Mimas_Mouse_Button_Action mimas_get_mouse_button(Mimas_Mouse_Button button);
+
 MIMAS_EXTERN_C_END
 
 #endif // !MIMAS_MIMAS_H_INCLUDE

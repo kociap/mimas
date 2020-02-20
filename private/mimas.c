@@ -135,3 +135,7 @@ void mimas_set_cursor_mode(Mimas_Window* const window, Mimas_Cursor_Mode const c
 void mimas_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
     mimas_platform_get_cursor_pos(x, y);
 }
+
+Mimas_Mouse_Button_Action mimas_get_mouse_button(Mimas_Mouse_Button button) {
+    return mimas_platform_get_mouse_button(button);
+}
