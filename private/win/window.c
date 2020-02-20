@@ -400,14 +400,14 @@ mimas_bool mimas_platform_init() {
         Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
         _mimas->platform = platform;
 
-        if(!mimas_platform_init_with_gl()) {
+        if(!mimas_platform_init_gl_backend()) {
             destroy_native_window(dummy_window);
             unregister_window_class();
             free(platform);
             return mimas_false;
         }
     } else {
-        if(!mimas_platform_init_with_vk()) {
+        if(!mimas_platform_init_vk_backend()) {
             unregister_window_class();
             free(platform);
             return mimas_false;
@@ -417,14 +417,14 @@ mimas_bool mimas_platform_init() {
     return mimas_true;
 }
 
-void mimas_platform_terminate() {
-    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    if(_mimas->backend == MIMAS_BACKEND_GL) {
-        mimas_platform_terminate_with_gl();
+void mimas_platform_terminate(Mimas_Backend const backend) {
+    if(backend == MIMAS_BACKEND_GL) {
+        mimas_platform_terminate_gl_backend();
     } else {
-        mimas_platform_terminate_with_vk();
+        mimas_platform_terminate_vk_backend();
     }
 
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas->platform;
     destroy_native_window(platform->dummy_window);
     unregister_window_class();

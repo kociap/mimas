@@ -7,7 +7,8 @@
 #include <stdlib.h>
 
 void mimas_terminate() {
-    mimas_platform_terminate();
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    mimas_platform_terminate(_mimas->backend);
     _mimas_terminate_internal();
 }
 

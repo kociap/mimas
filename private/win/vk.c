@@ -18,7 +18,7 @@ static PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
 
 typedef VkResult (*PFN_vkCreateWin32SurfaceKHR)(VkInstance, VkWin32SurfaceCreateInfoKHR const*, struct VkAllocationCallbacks const*, VkSurfaceKHR*);
 
-mimas_bool mimas_platform_init_with_vk() {
+mimas_bool mimas_platform_init_vk_backend() {
     vulkan_module = LoadLibraryW(L"vulkan-1.dll");
     if(vulkan_module) {
         vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)GetProcAddress(vulkan_module, "vkGetInstanceProcAddr");
@@ -29,7 +29,7 @@ mimas_bool mimas_platform_init_with_vk() {
     }
 }
 
-void mimas_platform_terminate_with_vk() {
+void mimas_platform_terminate_vk_backend() {
     FreeLibrary(vulkan_module);
 }
 

@@ -21,8 +21,8 @@ typedef enum VkResult {
     VK_RESULT_MAX_ENUM = 0x7FFFFFFF
 } VkResult;
 
-mimas_bool mimas_platform_init_with_vk();
-void mimas_platform_terminate_with_vk();
+mimas_bool mimas_platform_init_vk_backend();
+void mimas_platform_terminate_vk_backend();
 char const** mimas_platform_get_vk_extensions();
 VkResult mimas_platform_create_vk_surface(Mimas_Window*, VkInstance, struct VkAllocationCallbacks const*, VkSurfaceKHR*);
 

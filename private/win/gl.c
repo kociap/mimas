@@ -5,7 +5,7 @@
 
 #include <wingdi.h>
 
-mimas_bool mimas_platform_init_with_gl() {
+mimas_bool mimas_platform_init_gl_backend() {
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
     Mimas_Win_Window* const dummy_window = (Mimas_Win_Window*)platform->dummy_window->native_window;
     if(!mimas_load_wgl(GetDC(dummy_window->handle))) {
@@ -15,7 +15,7 @@ mimas_bool mimas_platform_init_with_gl() {
     return mimas_true;
 }
 
-void mimas_platform_terminate_with_gl() {
+void mimas_platform_terminate_gl_backend() {
     mimas_unload_wgl();
 }
 
