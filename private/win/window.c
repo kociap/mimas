@@ -465,6 +465,9 @@ void mimas_platform_poll_events() {
 
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
     GetKeyboardState(platform->keyboard_state);
+    platform->mouse_state[MIMAS_MOUSE_BUTTON_LEFT] = GetKeyState(VK_LBUTTON) & 0x8000;
+    platform->mouse_state[MIMAS_MOUSE_BUTTON_RIGHT] = GetKeyState(VK_RBUTTON) & 0x8000;
+    platform->mouse_state[MIMAS_MOUSE_BUTTON_MIDDLE] = GetKeyState(VK_MBUTTON) & 0x8000;
 }
 
 Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info const info) {
