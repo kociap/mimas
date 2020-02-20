@@ -107,6 +107,18 @@ typedef enum Mimas_Key_Action {
     MIMAS_KEY_REPEAT,
 } Mimas_Key_Action;
 
+typedef enum Mimas_Mouse_Button {
+    MIMAS_MOUSE_BUTTON_LEFT,
+    MIMAS_MOUSE_BUTTON_RIGHT,
+    MIMAS_MOUSE_BUTTON_MIDDLE,
+} Mimas_Mouse_Button;
+
+typedef enum Mimas_Mouse_Button_Action {
+    MIMAS_MOUSE_BUTTON_RELEASE,
+    MIMAS_MOUSE_BUTTON_PRESS,
+    MIMAS_MOUSE_BUTTON_DOUBLECLICK,
+} Mimas_Mouse_Button_Action;
+
 typedef enum Mimas_Hittest_Result {
     MIMAS_HITTEST_TOP,
     MIMAS_HITTEST_BOTTOM,
@@ -173,7 +185,11 @@ typedef void (*mimas_window_cursor_pos_callback)(Mimas_Window* window, mimas_i32
 MIMAS_API void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_cursor_pos_callback(Mimas_Window* window);
 
-typedef void (*mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, Mimas_Key_Action state, void* user_data);
+typedef void(*mimas_window_mouse_button_callback)(Mimas_Window* window, Mimas_Mouse_Button button, Mimas_Mouse_Button_Action action, void* user_data);
+MIMAS_API void mimas_set_window_mouse_button_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data);
+MIMAS_API Mimas_Callback mimas_get_window_mouse_button_callback(Mimas_Window* window);
+
+typedef void (*mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, Mimas_Key_Action action, void* user_data);
 MIMAS_API void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_key_callback(Mimas_Window* window);
 

@@ -202,6 +202,30 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
             }
         } break;
 
+        case WM_LBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+        case WM_XBUTTONDOWN: 
+        case WM_LBUTTONUP:
+        case WM_MBUTTONUP:
+        case WM_RBUTTONUP:
+        case WM_XBUTTONUP: {
+            if(window->callbacks.mouse_button) {
+                Mimas_Mouse_Button_Action const action = (msg == WM_LBUTTONUP || msg == WM_MBUTTONUP || msg == WM_RBUTTONUP || msg == WM_XBUTTONUP);
+                mimas_bool const is_lmb = (msg == WM_LBUTTONUP || msg == WM_LBUTTONDOWN);
+                mimas_bool const is_rmb = (msg == WM_RBUTTONUP || msg == WM_RBUTTONDOWN);
+                mimas_bool const is_mmb = (msg == WM_MBUTTONUP || msg == WM_MBUTTONDOWN);
+                mimas_bool const is_xmb = (msg == WM_XBUTTONUP || msg == WM_XBUTTONDOWN);
+                Mimas_Mouse_Button const button = MIMAS_MOUSE_BUTTON_LEFT * is_lmb | MIMAS_MOUSE_BUTTON_RIGHT * is_rmb | MIMAS_MOUSE_BUTTON_MIDDLE * is_mmb;
+                // TODO: Temporarily because we don't have enough buttons.
+                if(is_lmb || is_rmb || is_mmb) {
+                    window->callbacks.mouse_button(window, button, action, window->callbacks.mouse_button_data);
+                }
+            }
+
+            return 0;
+        } break;
+
         case WM_MOUSEMOVE: {
             mimas_i32 const x = GET_X_LPARAM(lparam);
             mimas_i32 const y = GET_Y_LPARAM(lparam);
