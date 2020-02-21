@@ -96,6 +96,11 @@ void mimas_get_window_content_size(Mimas_Window* const window, mimas_i32* const 
     mimas_platform_get_window_content_size(window, width, height);
 }
 
+mimas_bool mimas_is_window_active(Mimas_Window* window) {
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    return _mimas->active_window == window;
+}
+
 void mimas_show_window(Mimas_Window* const window) {
     mimas_platform_show_window(window);
 }

@@ -206,6 +206,7 @@ MIMAS_API void mimas_set_window_content_pos(Mimas_Window* window, mimas_i32 x, m
 MIMAS_API void mimas_get_window_content_pos(Mimas_Window* window, mimas_i32* x, mimas_i32* y);
 MIMAS_API void mimas_set_window_content_size(Mimas_Window* window, mimas_i32 width, mimas_i32 height);
 MIMAS_API void mimas_get_window_content_size(Mimas_Window* window, mimas_i32* width, mimas_i32* height);
+MIMAS_API mimas_bool mimas_is_window_active(Mimas_Window* window);
 
 MIMAS_API void mimas_show_window(Mimas_Window* window);
 MIMAS_API void mimas_hide_window(Mimas_Window* window);

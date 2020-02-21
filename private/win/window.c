@@ -149,6 +149,9 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                 enable_virtual_cursor(window);
             }
 
+            Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+            _mimas->active_window = window;
+
             if(window->callbacks.window_activate) {
                 window->callbacks.window_activate(window, mimas_true, window->callbacks.window_activate_data);
             }
@@ -160,6 +163,9 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
             } else if(window->cursor_mode == MIMAS_CURSOR_VIRTUAL) {
                 disable_virtual_cursor(window);
             }
+
+            Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+            _mimas->active_window = NULL;
 
             if(window->callbacks.key) {
                 for(mimas_u32 i = 0; i < ARRAY_SIZE(window->keys); ++i) {
