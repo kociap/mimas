@@ -218,10 +218,6 @@ MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 //
 MIMAS_API Mimas_Key_Action mimas_get_key(Mimas_Key key);
 
-// Returns: MIMAS_KEY_RELEASE when the key is released, MIMAS_KEY_PRESS when the key is pressed.
-//
-MIMAS_API Mimas_Key_Action mimas_get_key(Mimas_Key key);
-
 MIMAS_EXTERN_C_END
 
 #endif // !MIMAS_MIMAS_H_INCLUDE
