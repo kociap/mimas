@@ -101,12 +101,6 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                 DwmExtendFrameIntoClientArea(hwnd, &margins);
                 SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER);
             }
-
-            LRESULT const res = DefWindowProc(hwnd, msg, wparam, lparam);
-            if(window->callbacks.window_activate) {
-                window->callbacks.window_activate(window, wparam != 0, window->callbacks.window_activate_data);
-            }
-            return res;
         } break;
 
         case WM_NCCALCSIZE: {
