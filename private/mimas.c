@@ -141,6 +141,6 @@ void mimas_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
     mimas_platform_get_cursor_pos(x, y);
 }
 
-Mimas_Mouse_Button_Action mimas_get_mouse_button(Mimas_Mouse_Button button) {
-    return mimas_platform_get_mouse_button(button);
+Mimas_Key_Action mimas_get_key(Mimas_Key const key) {
+    return mimas_platform_get_key(key);
 }

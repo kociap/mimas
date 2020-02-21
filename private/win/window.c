@@ -13,6 +13,8 @@
 
 #include <stdio.h>
 
+#include <hidusage.h>
+
 static mimas_u32 get_window_styles(Mimas_Window const* const window) {
     return WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 }
@@ -181,6 +183,57 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
             }
         } break;
 
+        case WM_INPUT: {
+            Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
+            UINT size;
+            GetRawInputData((HRAWINPUT)lparam,  RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
+            RAWINPUT* const ri = malloc(size);
+            GetRawInputData((HRAWINPUT)lparam, RID_INPUT, ri, &size, sizeof(RAWINPUTHEADER));
+            switch(ri->header.dwType) {
+                case RIM_TYPEKEYBOARD: {
+                    RAWKEYBOARD* const kb = &ri->data.keyboard;
+                    // printf("RI (Keyboard): sc %d, e0 %d, e1 %d, state %d\n", kb->MakeCode, kb->Flags & RI_KEY_E0, kb->Flags & RI_KEY_E1, kb->Flags & RI_KEY_BREAK);
+                } break;
+
+                case RIM_TYPEMOUSE: {
+                    RAWMOUSE* const mouse = &ri->data.mouse;
+                    if(mouse->usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
+                        platform->key_state[MIMAS_MOUSE_LEFT_BUTTON] = MIMAS_KEY_PRESS;
+                    } else if(mouse->usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP) {
+                        platform->key_state[MIMAS_MOUSE_LEFT_BUTTON] = MIMAS_KEY_RELEASE;
+                    }
+
+                    if(mouse->usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
+                        platform->key_state[MIMAS_MOUSE_RIGHT_BUTTON] = MIMAS_KEY_PRESS;
+                    } else if(mouse->usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP) {
+                        platform->key_state[MIMAS_MOUSE_RIGHT_BUTTON] = MIMAS_KEY_RELEASE;
+                    }
+
+                    if(mouse->usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_DOWN) {
+                        platform->key_state[MIMAS_MOUSE_MIDDLE_BUTTON] = MIMAS_KEY_PRESS;
+                    } else if(mouse->usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_UP) {
+                        platform->key_state[MIMAS_MOUSE_MIDDLE_BUTTON] = MIMAS_KEY_RELEASE;
+                    }
+
+                    if(mouse->usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) {
+                        platform->key_state[MIMAS_MOUSE_THUMB_BUTTON_1] = MIMAS_KEY_PRESS;
+                    } else if(mouse->usButtonFlags & RI_MOUSE_BUTTON_4_UP) {
+                        platform->key_state[MIMAS_MOUSE_THUMB_BUTTON_1] = MIMAS_KEY_RELEASE;
+                    }
+
+                    if(mouse->usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) {
+                        platform->key_state[MIMAS_MOUSE_THUMB_BUTTON_2] = MIMAS_KEY_PRESS;
+                    } else if(mouse->usButtonFlags & RI_MOUSE_BUTTON_5_UP) {
+                        platform->key_state[MIMAS_MOUSE_THUMB_BUTTON_2] = MIMAS_KEY_RELEASE;
+                    }
+                } break;
+
+                case RIM_TYPEHID: {
+
+                } break;
+            }
+        } break;
+
         case WM_KEYUP:
         case WM_KEYDOWN: {
             mimas_bool const extended = lparam & 0x800000;
@@ -216,7 +269,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                 mimas_bool const is_rmb = (msg == WM_RBUTTONUP || msg == WM_RBUTTONDOWN);
                 mimas_bool const is_mmb = (msg == WM_MBUTTONUP || msg == WM_MBUTTONDOWN);
                 mimas_bool const is_xmb = (msg == WM_XBUTTONUP || msg == WM_XBUTTONDOWN);
-                Mimas_Mouse_Button const button = MIMAS_MOUSE_BUTTON_LEFT * is_lmb | MIMAS_MOUSE_BUTTON_RIGHT * is_rmb | MIMAS_MOUSE_BUTTON_MIDDLE * is_mmb;
+                Mimas_Key const button = MIMAS_MOUSE_LEFT_BUTTON * is_lmb | MIMAS_MOUSE_RIGHT_BUTTON * is_rmb | MIMAS_MOUSE_MIDDLE_BUTTON * is_mmb;
                 // TODO: Temporarily because we don't have enough buttons.
                 if(is_lmb || is_rmb || is_mmb) {
                     window->callbacks.mouse_button(window, button, action, window->callbacks.mouse_button_data);
@@ -375,6 +428,10 @@ mimas_bool mimas_platform_init() {
     platform->keys[0x59] = MIMAS_KEY_Y;
     platform->keys[0x5A] = MIMAS_KEY_Z;
 
+    platform->keys[VK_LBUTTON] = MIMAS_MOUSE_LEFT_BUTTON;
+    platform->keys[VK_RBUTTON] = MIMAS_MOUSE_RIGHT_BUTTON;
+    platform->keys[VK_MBUTTON] = MIMAS_MOUSE_MIDDLE_BUTTON;
+
     platform->keys[VK_UP] = MIMAS_KEY_UP;
     platform->keys[VK_DOWN] = MIMAS_KEY_DOWN;
     platform->keys[VK_LEFT] = MIMAS_KEY_LEFT;
@@ -399,30 +456,30 @@ mimas_bool mimas_platform_init() {
 
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     _mimas->platform = platform;
+    Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
+    if(!dummy_window) {
+        unregister_window_class();
+        free(platform);
+        _mimas->platform = NULL;
+        // TODO: Error
+        return mimas_false;
+    }
+    platform->dummy_window = dummy_window;
+
+    HWND const dummy_hwnd = ((Mimas_Win_Window*)dummy_window->native_window)->handle;
+    // If the program is launched with STARTUPINFO, the first call to ShowWindow will ignore the nCmdShow param,
+    //   therefore we call it here to clear that behaviour...
+    ShowWindow(dummy_hwnd, SW_HIDE);
+    // ... and call it again to make sure it's hidden.
+    ShowWindow(dummy_hwnd, SW_HIDE);
+
+    MSG msg;
+    while (PeekMessageW(&msg, dummy_hwnd, 0, 0, PM_REMOVE)) {
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
+    }
+
     if(_mimas->backend == MIMAS_BACKEND_GL) {
-         Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
-        if(!dummy_window) {
-            unregister_window_class();
-            free(platform);
-            _mimas->platform = NULL;
-            // TODO: Error
-            return mimas_false;
-        }
-
-        HWND const dummy_hwnd = ((Mimas_Win_Window*)dummy_window->native_window)->handle;
-        // If the program is launched with STARTUPINFO, the first call to ShowWindow will ignore the nCmdShow param,
-        //   therefore we call it here to clear that behaviour...
-        ShowWindow(dummy_hwnd, SW_HIDE);
-        // ... and call it again to make sure it's hidden.
-        ShowWindow(dummy_hwnd, SW_HIDE);
-
-        MSG msg;
-        while (PeekMessageW(&msg, dummy_hwnd, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
-
-        platform->dummy_window = dummy_window;
         if(!mimas_platform_init_gl_backend()) {
             destroy_native_window(dummy_window);
             unregister_window_class();
@@ -439,6 +496,14 @@ mimas_bool mimas_platform_init() {
         }
     }
 
+    // Install raw input listener 
+    RAWINPUTDEVICE rid[] = {
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_JOYSTICK, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd}
+    };
+    RegisterRawInputDevices(rid, 4, sizeof(RAWINPUTDEVICE));
 
     return mimas_true;
 }
@@ -467,9 +532,6 @@ void mimas_platform_poll_events() {
 
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
     GetKeyboardState(platform->keyboard_state);
-    platform->mouse_state[MIMAS_MOUSE_BUTTON_LEFT] = GetKeyState(VK_LBUTTON) & 0x8000;
-    platform->mouse_state[MIMAS_MOUSE_BUTTON_RIGHT] = GetKeyState(VK_RBUTTON) & 0x8000;
-    platform->mouse_state[MIMAS_MOUSE_BUTTON_MIDDLE] = GetKeyState(VK_MBUTTON) & 0x8000;
 }
 
 Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info const info) {

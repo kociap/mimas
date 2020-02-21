@@ -43,6 +43,12 @@ typedef unsigned long long mimas_u64;
 typedef enum Mimas_Key {
     MIMAS_KEY_UNKNOWN = -1,
 
+    MIMAS_MOUSE_LEFT_BUTTON,
+    MIMAS_MOUSE_RIGHT_BUTTON,
+    MIMAS_MOUSE_MIDDLE_BUTTON,
+    MIMAS_MOUSE_THUMB_BUTTON_1,
+    MIMAS_MOUSE_THUMB_BUTTON_2,
+
     MIMAS_KEY_0 = 48,
     MIMAS_KEY_1 = 49,
     MIMAS_KEY_2 = 50,
@@ -107,12 +113,6 @@ typedef enum Mimas_Key_Action {
     MIMAS_KEY_REPEAT,
 } Mimas_Key_Action;
 
-typedef enum Mimas_Mouse_Button {
-    MIMAS_MOUSE_BUTTON_LEFT,
-    MIMAS_MOUSE_BUTTON_RIGHT,
-    MIMAS_MOUSE_BUTTON_MIDDLE,
-} Mimas_Mouse_Button;
-
 typedef enum Mimas_Mouse_Button_Action {
     MIMAS_MOUSE_BUTTON_RELEASE,
     MIMAS_MOUSE_BUTTON_PRESS,
@@ -171,21 +171,19 @@ typedef struct Mimas_Callback {
     void* user_data;
 } Mimas_Callback;
 
-/*
- * activated parameter is 1 if activated, 0 if deactivated.
- */
+// activated parameter is 1 if activated, 0 if deactivated.
+//
 typedef void (*mimas_window_activate_callback)(Mimas_Window* window, mimas_i32 activated, void* user_data);
 MIMAS_API void mimas_set_window_activate_callback(Mimas_Window* window, mimas_window_activate_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_activate_callback(Mimas_Window* window);
 
-/*
- * x and y are the screen coordinates of the cursor.
- */
+// x and y are the screen coordinates of the cursor.
+//
 typedef void (*mimas_window_cursor_pos_callback)(Mimas_Window* window, mimas_i32 x, mimas_i32 y, void* user_data);
 MIMAS_API void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_cursor_pos_callback(Mimas_Window* window);
 
-typedef void(*mimas_window_mouse_button_callback)(Mimas_Window* window, Mimas_Mouse_Button button, Mimas_Mouse_Button_Action action, void* user_data);
+typedef void(*mimas_window_mouse_button_callback)(Mimas_Window* window, Mimas_Key button, Mimas_Mouse_Button_Action action, void* user_data);
 MIMAS_API void mimas_set_window_mouse_button_callback(Mimas_Window* window, mimas_window_mouse_button_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_mouse_button_callback(Mimas_Window* window);
 
@@ -193,9 +191,8 @@ typedef void (*mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, M
 MIMAS_API void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_key_callback(Mimas_Window* window);
 
-/*
- * Set custom hit function for the native window to define custom resize, drag, minimize, maximize and close behaviour.
- */
+// Set custom hit function for the native window to define custom resize, drag, minimize, maximize and close behaviour.
+//
 typedef Mimas_Hittest_Result (*mimas_window_hittest)(Mimas_Window* window, mimas_i32 cursor_x, mimas_i32 cursor_y, Mimas_Rect window_rect, Mimas_Rect client_rect);
 MIMAS_API void mimas_set_window_hittest(Mimas_Window* window, mimas_window_hittest callback);
 MIMAS_API Mimas_Callback mimas_get_window_hittest(Mimas_Window* window);
@@ -217,9 +214,13 @@ MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 MIMAS_API void mimas_set_cursor_mode(Mimas_Window* window, Mimas_Cursor_Mode);
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 
-// Note that this function only ever returns MIMAS_MOUSE_BUTTON_PRESS or MIMAS_MOUSE_BUTTON_RELEASE 
-// to indicate that the mouse button is currently down or not
-MIMAS_API Mimas_Mouse_Button_Action mimas_get_mouse_button(Mimas_Mouse_Button button);
+// Returns: MIMAS_KEY_RELEASE when the key is released, MIMAS_KEY_PRESS when the key is pressed.
+//
+MIMAS_API Mimas_Key_Action mimas_get_key(Mimas_Key key);
+
+// Returns: MIMAS_KEY_RELEASE when the key is released, MIMAS_KEY_PRESS when the key is pressed.
+//
+MIMAS_API Mimas_Key_Action mimas_get_key(Mimas_Key key);
 
 MIMAS_EXTERN_C_END
 
