@@ -79,18 +79,137 @@ static mimas_i32 window_hit_test(mimas_i32 const cursor_x, mimas_i32 const curso
     }
 }
 
-static Mimas_Key translate_key(mimas_u32 const vk, mimas_bool const extended) {
-    Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
-    Mimas_Key const key = platform->keys[vk];
-    if(extended) {
-        switch(key) {
-            case MIMAS_KEY_ENTER: 
-                return MIMAS_KEY_NUMPAD_ENTER;
-            default:
-                return key;
-        }
-    } else {
-        return key;
+static Mimas_Key _translate_scan_code(mimas_i32 const sc) {
+    Mimas_Key vk_map[256];
+    memset(vk_map, MIMAS_KEY_UNKNOWN, sizeof(vk_map));
+    vk_map[VK_ESCAPE] = MIMAS_KEY_ESCAPE;
+    vk_map[VK_BACK] = MIMAS_KEY_BACKSPACE;
+    vk_map[VK_TAB] = MIMAS_KEY_TAB;
+    vk_map[VK_PAUSE] = MIMAS_KEY_PAUSE;
+    vk_map[VK_CAPITAL] = MIMAS_KEY_CAPS_LOCK;
+    vk_map[VK_SPACE] = MIMAS_KEY_SPACE;
+    vk_map[VK_SNAPSHOT] = MIMAS_KEY_PRINT_SCREEN;
+    vk_map[0x30] = MIMAS_KEY_0;
+    vk_map[0x31] = MIMAS_KEY_1;
+    vk_map[0x32] = MIMAS_KEY_2;
+    vk_map[0x33] = MIMAS_KEY_3;
+    vk_map[0x34] = MIMAS_KEY_4;
+    vk_map[0x35] = MIMAS_KEY_5;
+    vk_map[0x36] = MIMAS_KEY_6;
+    vk_map[0x37] = MIMAS_KEY_7;
+    vk_map[0x38] = MIMAS_KEY_8;
+    vk_map[0x39] = MIMAS_KEY_9;
+    vk_map[0x30] = MIMAS_KEY_0;
+    vk_map[0x41] = MIMAS_KEY_A;
+    vk_map[0x42] = MIMAS_KEY_B;
+    vk_map[0x43] = MIMAS_KEY_C;
+    vk_map[0x44] = MIMAS_KEY_D;
+    vk_map[0x45] = MIMAS_KEY_E;
+    vk_map[0x46] = MIMAS_KEY_F;
+    vk_map[0x47] = MIMAS_KEY_G;
+    vk_map[0x48] = MIMAS_KEY_H;
+    vk_map[0x49] = MIMAS_KEY_I;
+    vk_map[0x4A] = MIMAS_KEY_J;
+    vk_map[0x4B] = MIMAS_KEY_K;
+    vk_map[0x4C] = MIMAS_KEY_L;
+    vk_map[0x4D] = MIMAS_KEY_M;
+    vk_map[0x4E] = MIMAS_KEY_N;
+    vk_map[0x4F] = MIMAS_KEY_O;
+    vk_map[0x50] = MIMAS_KEY_P;
+    vk_map[0x51] = MIMAS_KEY_Q;
+    vk_map[0x52] = MIMAS_KEY_R;
+    vk_map[0x53] = MIMAS_KEY_S;
+    vk_map[0x54] = MIMAS_KEY_T;
+    vk_map[0x55] = MIMAS_KEY_U;
+    vk_map[0x56] = MIMAS_KEY_V;
+    vk_map[0x57] = MIMAS_KEY_W;
+    vk_map[0x58] = MIMAS_KEY_X;
+    vk_map[0x59] = MIMAS_KEY_Y;
+    vk_map[0x5A] = MIMAS_KEY_Z;
+    vk_map[VK_MULTIPLY] = MIMAS_KEY_NUMPAD_MULTIPLY;
+    vk_map[VK_ADD] = MIMAS_KEY_NUMPAD_ADD;
+    vk_map[VK_SUBTRACT] = MIMAS_KEY_NUMPAD_SUBTRACT;
+    vk_map[VK_DECIMAL] = MIMAS_KEY_NUMPAD_DECIMAL;
+    vk_map[VK_F1] = MIMAS_KEY_F1;
+    vk_map[VK_F2] = MIMAS_KEY_F2;
+    vk_map[VK_F3] = MIMAS_KEY_F3;
+    vk_map[VK_F4] = MIMAS_KEY_F4;
+    vk_map[VK_F5] = MIMAS_KEY_F5;
+    vk_map[VK_F6] = MIMAS_KEY_F6;
+    vk_map[VK_F7] = MIMAS_KEY_F7;
+    vk_map[VK_F8] = MIMAS_KEY_F8;
+    vk_map[VK_F9] = MIMAS_KEY_F9;
+    vk_map[VK_F10] = MIMAS_KEY_F10;
+    vk_map[VK_F11] = MIMAS_KEY_F11;
+    vk_map[VK_F12] = MIMAS_KEY_F12;
+    vk_map[VK_NUMLOCK] = MIMAS_KEY_NUMLOCK;
+    vk_map[VK_SCROLL] = MIMAS_KEY_SCROLL_LOCK;
+    UINT const key = MapVirtualKeyW(sc, MAPVK_VSC_TO_VK_EX);
+    return vk_map[key];
+}
+
+static Mimas_Key translate_scan_code(mimas_i32 const sc, mimas_bool const e0, mimas_bool const e1) {
+    // MapVirtualKey doesn't properly translate left- and right- keys, numpad, extended us keyboard keys, 
+    // so we do it manually.
+    switch(sc) {
+        case 0x1c:
+            return (MIMAS_KEY_NUMPAD_ENTER & (0 - e0)) | (MIMAS_KEY_ENTER & (0 - !e0));
+        case 0x1d:
+            return (MIMAS_KEY_RIGHT_CONTROL & (0 - e0)) | (MIMAS_KEY_LEFT_CONTROL & (0 - !e0));
+        case 0x38:
+            return (MIMAS_KEY_RIGHT_ALT & (0 - e0)) | (MIMAS_KEY_LEFT_ALT & (0 - !e0));
+        case 0x2a:
+            return MIMAS_KEY_LEFT_SHIFT;
+        case 0x36:
+            return MIMAS_KEY_RIGHT_SHIFT;
+        case 0x52:
+            return (MIMAS_KEY_INSERT & (0 - e0)) | (MIMAS_KEY_NUMPAD_0 & (0 - !e0));
+        case 0x4f:
+            return (MIMAS_KEY_END & (0 - e0)) | (MIMAS_KEY_NUMPAD_1 & (0 - !e0));
+        case 0x50:
+            return (MIMAS_KEY_DOWN & (0 - e0)) | (MIMAS_KEY_NUMPAD_2 & (0 - !e0));
+        case 0x51:
+            return (MIMAS_KEY_PAGE_DOWN & (0 - e0)) | (MIMAS_KEY_NUMPAD_3 & (0 - !e0));
+        case 0x4b:
+            return (MIMAS_KEY_LEFT & (0 - e0)) | (MIMAS_KEY_NUMPAD_4 & (0 - !e0));
+        case 0x4c:
+            return MIMAS_KEY_NUMPAD_5;
+        case 0x4d:
+            return (MIMAS_KEY_RIGHT & (0 - e0)) | (MIMAS_KEY_NUMPAD_6 & (0 - !e0));
+        case 0x47:
+            return (MIMAS_KEY_HOME & (0 - e0)) | (MIMAS_KEY_NUMPAD_7 & (0 - !e0));
+        case 0x48:
+            return (MIMAS_KEY_UP & (0 - e0)) | (MIMAS_KEY_NUMPAD_8 & (0 - !e0));
+        case 0x49:
+            return (MIMAS_KEY_PAGE_UP & (0 - e0)) | (MIMAS_KEY_NUMPAD_9 & (0 - !e0));
+        case 0x53:
+            return (MIMAS_KEY_DELETE & (0 - e0)) | (MIMAS_KEY_NUMPAD_DECIMAL & (0 - !e0));
+        case 0x35:
+            return (MIMAS_KEY_NUMPAD_DIVIDE & (0 - e0)) | (MIMAS_KEY_SLASH & (0 - !e0));
+        case 0x27:
+            return MIMAS_KEY_SEMICOLON;
+        case 0x28:
+            return MIMAS_KEY_APOSTROPHE;
+        case 0x29:
+            return MIMAS_KEY_TICK;
+        case 0xc:
+            return MIMAS_KEY_MINUS;
+        case 0xd:
+            return MIMAS_KEY_EQUALS;
+        case 0x33:
+            return MIMAS_KEY_COMMA;
+        case 0x34:
+            return MIMAS_KEY_DOT;
+        case 0x1a:
+            return MIMAS_KEY_LEFT_BRACKET;
+        case 0x1b:
+            return MIMAS_KEY_RIGHT_BRACKET;
+        case 0x2b:
+            return MIMAS_KEY_BACKWARD_SLASH;
+
+        default:
+            // Translate remaining keys.
+            return _translate_scan_code(sc);
     }
 }
 
@@ -192,7 +311,13 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
             switch(ri->header.dwType) {
                 case RIM_TYPEKEYBOARD: {
                     RAWKEYBOARD* const kb = &ri->data.keyboard;
-                    // printf("RI (Keyboard): sc %d, e0 %d, e1 %d, state %d\n", kb->MakeCode, kb->Flags & RI_KEY_E0, kb->Flags & RI_KEY_E1, kb->Flags & RI_KEY_BREAK);
+                    mimas_bool const e0 = !!(kb->Flags & RI_KEY_E0);
+                    mimas_bool const e1 = !!(kb->Flags & RI_KEY_E1);
+                    Mimas_Key_Action const action = !(kb->Flags & RI_KEY_BREAK);
+                    Mimas_Key const key = translate_scan_code(kb->MakeCode, e0, e1);
+                    if(key != MIMAS_KEY_UNKNOWN) {
+                        platform->key_state[key] = action;
+                    }
                 } break;
 
                 case RIM_TYPEMOUSE: {
@@ -236,16 +361,19 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
         case WM_KEYUP:
         case WM_KEYDOWN: {
-            mimas_bool const extended = lparam & 0x800000;
-            mimas_bool const key_was_up = lparam & 0x80000000;
-            Mimas_Key const key = translate_key(wparam, extended);
+            mimas_u32 const sc = (lparam & 0xFF0000) >> 16;
+            mimas_bool const extended = !!(lparam & 0x800000);
+            mimas_bool const key_was_up = !!(lparam & 0x80000000);
             Mimas_Key_Action action;
-            if(key_was_up && msg == WM_KEYDOWN) {
-                action = MIMAS_KEY_PRESS;
-            } else if(msg == WM_KEYDOWN) {
-                action = MIMAS_KEY_REPEAT;
+            if(msg == WM_KEYDOWN) {
+                action = key_was_up ? MIMAS_KEY_PRESS : MIMAS_KEY_REPEAT;
             } else {
                 action = MIMAS_KEY_RELEASE;
+            }
+
+            Mimas_Key const key = translate_scan_code(sc, extended, 0);
+            if(key == MIMAS_KEY_UNKNOWN) {
+                break;
             }
 
             window->keys[key] = action;
@@ -388,66 +516,6 @@ static void destroy_native_window(Mimas_Window* const window) {
 mimas_bool mimas_platform_init() {
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)malloc(sizeof(Mimas_Win_Platform));
     memset(platform, 0, sizeof(Mimas_Win_Platform));
-    memset(platform->keys, -1, sizeof(platform->keys));
-
-    platform->keys[0x30] = MIMAS_KEY_0;
-    platform->keys[0x31] = MIMAS_KEY_1;
-    platform->keys[0x32] = MIMAS_KEY_2;
-    platform->keys[0x33] = MIMAS_KEY_3;
-    platform->keys[0x34] = MIMAS_KEY_4;
-    platform->keys[0x35] = MIMAS_KEY_5;
-    platform->keys[0x36] = MIMAS_KEY_6;
-    platform->keys[0x37] = MIMAS_KEY_7;
-    platform->keys[0x38] = MIMAS_KEY_8;
-    platform->keys[0x39] = MIMAS_KEY_9;
-
-    platform->keys[0x41] = MIMAS_KEY_A;
-    platform->keys[0x42] = MIMAS_KEY_B;
-    platform->keys[0x43] = MIMAS_KEY_C;
-    platform->keys[0x44] = MIMAS_KEY_D;
-    platform->keys[0x45] = MIMAS_KEY_E;
-    platform->keys[0x46] = MIMAS_KEY_F;
-    platform->keys[0x47] = MIMAS_KEY_G;
-    platform->keys[0x48] = MIMAS_KEY_H;
-    platform->keys[0x49] = MIMAS_KEY_I;
-    platform->keys[0x4A] = MIMAS_KEY_J;
-    platform->keys[0x4B] = MIMAS_KEY_K;
-    platform->keys[0x4C] = MIMAS_KEY_L;
-    platform->keys[0x4D] = MIMAS_KEY_M;
-    platform->keys[0x4E] = MIMAS_KEY_N;
-    platform->keys[0x4F] = MIMAS_KEY_O;
-    platform->keys[0x50] = MIMAS_KEY_P;
-    platform->keys[0x51] = MIMAS_KEY_Q;
-    platform->keys[0x52] = MIMAS_KEY_R;
-    platform->keys[0x53] = MIMAS_KEY_S;
-    platform->keys[0x54] = MIMAS_KEY_T;
-    platform->keys[0x55] = MIMAS_KEY_U;
-    platform->keys[0x56] = MIMAS_KEY_V;
-    platform->keys[0x57] = MIMAS_KEY_W;
-    platform->keys[0x58] = MIMAS_KEY_X;
-    platform->keys[0x59] = MIMAS_KEY_Y;
-    platform->keys[0x5A] = MIMAS_KEY_Z;
-
-    platform->keys[VK_LBUTTON] = MIMAS_MOUSE_LEFT_BUTTON;
-    platform->keys[VK_RBUTTON] = MIMAS_MOUSE_RIGHT_BUTTON;
-    platform->keys[VK_MBUTTON] = MIMAS_MOUSE_MIDDLE_BUTTON;
-
-    platform->keys[VK_UP] = MIMAS_KEY_UP;
-    platform->keys[VK_DOWN] = MIMAS_KEY_DOWN;
-    platform->keys[VK_LEFT] = MIMAS_KEY_LEFT;
-    platform->keys[VK_RIGHT] = MIMAS_KEY_RIGHT;
-
-    platform->keys[VK_TAB] = MIMAS_KEY_TAB;
-    platform->keys[VK_PRIOR] = MIMAS_KEY_PAGE_UP;
-    platform->keys[VK_NEXT] = MIMAS_KEY_PAGE_DOWN;
-    platform->keys[VK_HOME] = MIMAS_KEY_HOME;
-    platform->keys[VK_END] = MIMAS_KEY_END;
-    platform->keys[VK_INSERT] = MIMAS_KEY_INSERT;
-    platform->keys[VK_DELETE] = MIMAS_KEY_DELETE;
-    platform->keys[VK_BACK] = MIMAS_KEY_BACKSPACE;
-    platform->keys[VK_SPACE] = MIMAS_KEY_SPACE;
-    platform->keys[VK_RETURN] = MIMAS_KEY_ENTER;
-    platform->keys[VK_ESCAPE] = MIMAS_KEY_ESCAPE;
 
     mimas_bool const register_res = register_window_class();
     if(!register_res) {

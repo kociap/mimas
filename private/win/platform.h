@@ -22,9 +22,7 @@ typedef struct {
 
 typedef struct {
     mimas_u8 keyboard_state[256];
-    mimas_i32 virtual_keys[256];
     Mimas_Key_Action key_state[256];
-    Mimas_Key keys[256];
     Mimas_Window* dummy_window;
 } Mimas_Win_Platform;
 
