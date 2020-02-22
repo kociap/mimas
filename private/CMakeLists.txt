@@ -11,6 +11,8 @@ target_sources(mimas
     "${CMAKE_CURRENT_SOURCE_DIR}/utils.h"
 )
 
+target_include_directories(mimas PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+
 if(WIN32)
     message(STATUS "Mimas compiled for Win32")
     target_sources(mimas
@@ -23,7 +25,6 @@ if(WIN32)
         "${CMAKE_CURRENT_SOURCE_DIR}/win/wgl.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/window.c"
     )
-    target_include_directories(mimas PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
     target_link_libraries(mimas PRIVATE dwmapi gdi32)
 
     if(BUILD_SHARED_LIBS)

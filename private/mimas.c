@@ -37,6 +37,15 @@ Mimas_Callback mimas_get_window_activate_callback(Mimas_Window* window) {
     return (Mimas_Callback){(void*)window->callbacks.window_activate, window->callbacks.window_activate_data};
 }
 
+void mimas_set_window_resize_callback(Mimas_Window* window, mimas_window_resize_callback callback, void* user_data) {
+    window->callbacks.window_resize = callback;
+    window->callbacks.window_resize_data = user_data;
+}
+
+Mimas_Callback mimas_get_window_resize_callback(Mimas_Window* window) {
+    return (Mimas_Callback){(void*)window->callbacks.window_resize, window->callbacks.window_resize_data};
+}
+
 void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data) {
     window->callbacks.cursor_pos = callback;
     window->callbacks.cursor_pos_data = user_data;
@@ -96,6 +105,11 @@ void mimas_get_window_content_size(Mimas_Window* const window, mimas_i32* const 
     mimas_platform_get_window_content_size(window, width, height);
 }
 
+mimas_bool mimas_is_window_active(Mimas_Window* window) {
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    return _mimas->active_window == window;
+}
+
 void mimas_show_window(Mimas_Window* const window) {
     mimas_platform_show_window(window);
 }
@@ -136,6 +150,6 @@ void mimas_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
     mimas_platform_get_cursor_pos(x, y);
 }
 
-Mimas_Mouse_Button_Action mimas_get_mouse_button(Mimas_Mouse_Button button) {
-    return mimas_platform_get_mouse_button(button);
+Mimas_Key_Action mimas_get_key(Mimas_Key const key) {
+    return mimas_platform_get_key(key);
 }
