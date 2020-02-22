@@ -21,7 +21,6 @@ typedef struct {
 } Mimas_Win_Window;
 
 typedef struct {
-    mimas_u8 keyboard_state[256];
     Mimas_Key_Action key_state[256];
     Mimas_Window* dummy_window;
 } Mimas_Win_Platform;

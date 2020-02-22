@@ -597,9 +597,6 @@ void mimas_platform_poll_events() {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-
-    Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
-    GetKeyboardState(platform->keyboard_state);
 }
 
 Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info const info) {
