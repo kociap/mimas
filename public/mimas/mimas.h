@@ -232,6 +232,7 @@ typedef void (*mimas_window_activate_callback)(Mimas_Window* window, mimas_i32 a
 MIMAS_API void mimas_set_window_activate_callback(Mimas_Window* window, mimas_window_activate_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_activate_callback(Mimas_Window* window);
 
+
 typedef void (*mimas_window_resize_callback)(Mimas_Window* window, mimas_i32 w, mimas_i32 h, void* user_data);
 MIMAS_API void mimas_set_window_resize_callback(Mimas_Window* window, mimas_window_resize_callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_resize_callback(Mimas_Window* window);
