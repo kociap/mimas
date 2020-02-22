@@ -215,103 +215,11 @@ static Mimas_Key translate_scan_code(mimas_i32 const sc, mimas_bool const e0, mi
 
 static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam, LPARAM const lparam) {
     Mimas_Window* const window = GetPropW(hwnd, L"Mimas_Window");
-    switch(msg) {
-        case WM_ACTIVATE: {
-            if(!window->decorated) {
-                MARGINS const margins = {1, 1, 1, 1};
-                DwmExtendFrameIntoClientArea(hwnd, &margins);
-                SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER);
-            }
-        } break;
-
-        case WM_SIZE: {
-            // TODO: Handle minimmize separately? (This is specified in the wparam parameter)
-            if (window && window->callbacks.window_resize) {
-                window->callbacks.window_resize(window, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), 
-                    window->callbacks.window_resize_data);
-            }
-        } break;
-
-        case WM_NCCALCSIZE: {
-            if(wparam == TRUE && !window->decorated) {
-                return 0;
-            }
-        } break;
-
-        case WM_NCHITTEST: {
-            RECT window_rect;
-            GetWindowRect(hwnd, &window_rect);
-            RECT client_rect;
-            GetClientRect(hwnd, &client_rect);
-            ClientToScreen(hwnd, (POINT*)&client_rect.left);
-            ClientToScreen(hwnd, (POINT*)&client_rect.right);
-            if(window->callbacks.hittest) {
-                Mimas_Rect const _window_rect = {window_rect.left, window_rect.top, window_rect.bottom, window_rect.right};
-                Mimas_Rect const _client_rect = {client_rect.left, client_rect.top, client_rect.bottom, client_rect.right};
-                Mimas_Hittest_Result const r = window->callbacks.hittest(window, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), _window_rect, _client_rect);
-                mimas_i32 const hit[] = {
-                    [MIMAS_HITTEST_TOP] = HTTOP,
-                    [MIMAS_HITTEST_BOTTOM] = HTBOTTOM,
-                    [MIMAS_HITTEST_LEFT] = HTLEFT,
-                    [MIMAS_HITTEST_RIGHT] = HTRIGHT,
-                    [MIMAS_HITTEST_TOP_LEFT] = HTTOPLEFT,
-                    [MIMAS_HITTEST_TOP_RIGHT] = HTTOPRIGHT,
-                    [MIMAS_HITTEST_BOTTOM_LEFT] = HTBOTTOMLEFT,
-                    [MIMAS_HITTEST_BOTTOM_RIGHT] = HTBOTTOMRIGHT,
-                    [MIMAS_HITTEST_CLIENT] = HTCLIENT,
-                    [MIMAS_HITTEST_TITLEBAR] = HTCAPTION,
-                    [MIMAS_HITTEST_MINIMIZE] = HTMINBUTTON,
-                    [MIMAS_HITTEST_MAXIMIZE] = HTMAXBUTTON,
-                    [MIMAS_HITTEST_CLOSE] = HTCLOSE,
-                    [MIMAS_HITTEST_NOWHERE] = HTNOWHERE,
-                };
-                return hit[r];
-            } else if(!window->decorated) {
-                return window_hit_test(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), window_rect);
-            }
-        } break;
-
-        case WM_SETFOCUS: {
-            if(window->cursor_mode == MIMAS_CURSOR_CAPTURED) {
-                capture_cursor(window);
-            } else if(window->cursor_mode == MIMAS_CURSOR_VIRTUAL) {
-                enable_virtual_cursor(window);
-            }
-
-            Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-            _mimas->active_window = window;
-
-            if(window->callbacks.window_activate) {
-                window->callbacks.window_activate(window, mimas_true, window->callbacks.window_activate_data);
-            }
-        } break;
-
-        case WM_KILLFOCUS: {
-            if(window->cursor_mode == MIMAS_CURSOR_CAPTURED) {
-                release_captured_cursor();
-            } else if(window->cursor_mode == MIMAS_CURSOR_VIRTUAL) {
-                disable_virtual_cursor(window);
-            }
-
-            Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-            _mimas->active_window = NULL;
-
-            if(window->callbacks.key) {
-                for(mimas_u32 i = 0; i < ARRAY_SIZE(window->keys); ++i) {
-                    if(window->keys[i] != MIMAS_KEY_RELEASE) {
-                        window->keys[i] = MIMAS_KEY_RELEASE;
-                        window->callbacks.key(window, i, MIMAS_KEY_RELEASE, window->callbacks.key_data);
-                    }
-                }
-            }
-
-            if(window->callbacks.window_activate) {
-                window->callbacks.window_activate(window, mimas_false, window->callbacks.window_activate_data);
-            }
-        } break;
-
-        case WM_INPUT: {
+    mimas_bool const global_input_handler = (mimas_bool)GetPropW(hwnd, L"global_input_handler");
+    if(global_input_handler) {
+        if(msg == WM_INPUT) {
             Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
+            Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
             UINT size;
             GetRawInputData((HRAWINPUT)lparam,  RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
             RAWINPUT* const ri = malloc(size);
@@ -325,6 +233,9 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                     Mimas_Key const key = translate_scan_code(kb->MakeCode, e0, e1);
                     if(key != MIMAS_KEY_UNKNOWN) {
                         platform->key_state[key] = action;
+                        if(_mimas->active_window && _mimas->active_window->callbacks.key) {
+                            _mimas->active_window->callbacks.key(_mimas->active_window, key, action, _mimas->active_window->callbacks.key_data);
+                        }
                     }
                 } break;
 
@@ -365,74 +276,158 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
                 } break;
             }
-        } break;
+        }
 
-        case WM_KEYUP:
-        case WM_KEYDOWN: {
-            mimas_u32 const sc = (lparam & 0xFF0000) >> 16;
-            mimas_bool const extended = !!(lparam & 0x800000);
-            mimas_bool const key_was_up = !!(lparam & 0x80000000);
-            Mimas_Key_Action action;
-            if(msg == WM_KEYDOWN) {
-                action = key_was_up ? MIMAS_KEY_PRESS : MIMAS_KEY_REPEAT;
-            } else {
-                action = MIMAS_KEY_RELEASE;
-            }
-
-            Mimas_Key const key = translate_scan_code(sc, extended, 0);
-            if(key == MIMAS_KEY_UNKNOWN) {
-                break;
-            }
-
-            window->keys[key] = action;
-
-            if(window->callbacks.key) {
-                window->callbacks.key(window, key, action, window->callbacks.key_data);
-            }
-        } break;
-
-        case WM_LBUTTONDOWN:
-        case WM_MBUTTONDOWN:
-        case WM_RBUTTONDOWN:
-        case WM_XBUTTONDOWN: 
-        case WM_LBUTTONUP:
-        case WM_MBUTTONUP:
-        case WM_RBUTTONUP:
-        case WM_XBUTTONUP: {
-            if(window->callbacks.mouse_button) {
-                Mimas_Mouse_Button_Action const action = (msg == WM_LBUTTONUP || msg == WM_MBUTTONUP || msg == WM_RBUTTONUP || msg == WM_XBUTTONUP);
-                mimas_bool const is_lmb = (msg == WM_LBUTTONUP || msg == WM_LBUTTONDOWN);
-                mimas_bool const is_rmb = (msg == WM_RBUTTONUP || msg == WM_RBUTTONDOWN);
-                mimas_bool const is_mmb = (msg == WM_MBUTTONUP || msg == WM_MBUTTONDOWN);
-                mimas_bool const is_xmb = (msg == WM_XBUTTONUP || msg == WM_XBUTTONDOWN);
-                Mimas_Key const button = MIMAS_MOUSE_LEFT_BUTTON * is_lmb | MIMAS_MOUSE_RIGHT_BUTTON * is_rmb | MIMAS_MOUSE_MIDDLE_BUTTON * is_mmb;
-                // TODO: Temporarily because we don't have enough buttons.
-                if(is_lmb || is_rmb || is_mmb) {
-                    window->callbacks.mouse_button(window, button, action, window->callbacks.mouse_button_data);
+        return DefWindowProc(hwnd, msg, wparam, lparam);
+    } else {
+        switch(msg) {
+            case WM_ACTIVATE: {
+                if(!window->decorated) {
+                    MARGINS const margins = {1, 1, 1, 1};
+                    DwmExtendFrameIntoClientArea(hwnd, &margins);
+                    SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER);
                 }
-            }
+            } break;
 
-            return 0;
-        } break;
+            case WM_NCCALCSIZE: {
+                if(wparam == TRUE && !window->decorated) {
+                    return 0;
+                }
+            } break;
 
-        case WM_MOUSEMOVE: {
-            mimas_i32 const x = GET_X_LPARAM(lparam);
-            mimas_i32 const y = GET_Y_LPARAM(lparam);
+            case WM_NCHITTEST: {
+                RECT window_rect;
+                GetWindowRect(hwnd, &window_rect);
+                RECT client_rect;
+                GetClientRect(hwnd, &client_rect);
+                ClientToScreen(hwnd, (POINT*)&client_rect.left);
+                ClientToScreen(hwnd, (POINT*)&client_rect.right);
+                if(window->callbacks.hittest) {
+                    Mimas_Rect const _window_rect = {window_rect.left, window_rect.top, window_rect.bottom, window_rect.right};
+                    Mimas_Rect const _client_rect = {client_rect.left, client_rect.top, client_rect.bottom, client_rect.right};
+                    Mimas_Hittest_Result const r = window->callbacks.hittest(window, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), _window_rect, _client_rect);
+                    mimas_i32 const hit[] = {
+                        [MIMAS_HITTEST_TOP] = HTTOP,
+                        [MIMAS_HITTEST_BOTTOM] = HTBOTTOM,
+                        [MIMAS_HITTEST_LEFT] = HTLEFT,
+                        [MIMAS_HITTEST_RIGHT] = HTRIGHT,
+                        [MIMAS_HITTEST_TOP_LEFT] = HTTOPLEFT,
+                        [MIMAS_HITTEST_TOP_RIGHT] = HTTOPRIGHT,
+                        [MIMAS_HITTEST_BOTTOM_LEFT] = HTBOTTOMLEFT,
+                        [MIMAS_HITTEST_BOTTOM_RIGHT] = HTBOTTOMRIGHT,
+                        [MIMAS_HITTEST_CLIENT] = HTCLIENT,
+                        [MIMAS_HITTEST_TITLEBAR] = HTCAPTION,
+                        [MIMAS_HITTEST_MINIMIZE] = HTMINBUTTON,
+                        [MIMAS_HITTEST_MAXIMIZE] = HTMAXBUTTON,
+                        [MIMAS_HITTEST_CLOSE] = HTCLOSE,
+                        [MIMAS_HITTEST_NOWHERE] = HTNOWHERE,
+                    };
+                    return hit[r];
+                } else if(!window->decorated) {
+                    return window_hit_test(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), window_rect);
+                }
+            } break;
 
-            if(window->callbacks.cursor_pos) {
-                window->callbacks.cursor_pos(window, x, y, window->callbacks.cursor_pos_data);
-            }
+            case WM_SETFOCUS: {
+                if(window->cursor_mode == MIMAS_CURSOR_CAPTURED) {
+                    capture_cursor(window);
+                } else if(window->cursor_mode == MIMAS_CURSOR_VIRTUAL) {
+                    enable_virtual_cursor(window);
+                }
 
-            return 0;
-        } break;
+                Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+                _mimas->active_window = window;
 
-        case WM_CLOSE: {
-            window->close_requested = mimas_true;
-            return 0;
-        } break;
+                if(window->callbacks.window_activate) {
+                    window->callbacks.window_activate(window, mimas_true, window->callbacks.window_activate_data);
+                }
+            } break;
+
+            case WM_KILLFOCUS: {
+                if(window->cursor_mode == MIMAS_CURSOR_CAPTURED) {
+                    release_captured_cursor();
+                } else if(window->cursor_mode == MIMAS_CURSOR_VIRTUAL) {
+                    disable_virtual_cursor(window);
+                }
+
+                Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+                _mimas->active_window = NULL;
+
+                if(window->callbacks.key) {
+                    for(mimas_u32 i = 0; i < ARRAY_SIZE(window->keys); ++i) {
+                        if(window->keys[i] != MIMAS_KEY_RELEASE) {
+                            window->keys[i] = MIMAS_KEY_RELEASE;
+                            window->callbacks.key(window, i, MIMAS_KEY_RELEASE, window->callbacks.key_data);
+                        }
+                    }
+                }
+
+                if(window->callbacks.window_activate) {
+                    window->callbacks.window_activate(window, mimas_false, window->callbacks.window_activate_data);
+                }
+            } break;
+
+            case WM_SIZE: {
+                // TODO: Handle minimmize separately? (This is specified in the wparam parameter)
+                if (window && window->callbacks.window_resize) {
+                    window->callbacks.window_resize(window, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), 
+                        window->callbacks.window_resize_data);
+                }
+            } break;
+
+            case WM_LBUTTONDOWN:
+            case WM_LBUTTONUP: {
+                if(window->callbacks.mouse_button) {
+                    window->callbacks.mouse_button(window, MIMAS_MOUSE_LEFT_BUTTON, msg == WM_LBUTTONDOWN, window->callbacks.mouse_button_data);
+                }
+                return TRUE;
+            } break;
+
+            case WM_RBUTTONDOWN:
+            case WM_RBUTTONUP: {
+                if(window->callbacks.mouse_button) {
+                    window->callbacks.mouse_button(window, MIMAS_MOUSE_RIGHT_BUTTON, msg == WM_RBUTTONDOWN, window->callbacks.mouse_button_data);
+                }
+                return TRUE;
+            } break;
+
+            case WM_MBUTTONDOWN:
+            case WM_MBUTTONUP: {
+                if(window->callbacks.mouse_button) {
+                    window->callbacks.mouse_button(window, MIMAS_MOUSE_MIDDLE_BUTTON, msg == WM_MBUTTONDOWN, window->callbacks.mouse_button_data);
+                }
+                return TRUE;
+            } break;
+
+            case WM_XBUTTONDOWN: 
+            case WM_XBUTTONUP: {
+                if(window->callbacks.mouse_button) {
+                    WORD const hw = HIWORD(wparam);
+                    Mimas_Key const key = (MIMAS_MOUSE_THUMB_BUTTON_1 & (0 - !!(hw & XBUTTON1))) | (MIMAS_MOUSE_THUMB_BUTTON_2 & (0 - !!(hw & XBUTTON2)));
+                    window->callbacks.mouse_button(window, key, msg == WM_XBUTTONDOWN, window->callbacks.mouse_button_data);
+                }
+                return TRUE;
+            } break;
+
+            case WM_MOUSEMOVE: {
+                mimas_i32 const x = GET_X_LPARAM(lparam);
+                mimas_i32 const y = GET_Y_LPARAM(lparam);
+
+                if(window->callbacks.cursor_pos) {
+                    window->callbacks.cursor_pos(window, x, y, window->callbacks.cursor_pos_data);
+                }
+
+                return 0;
+            } break;
+
+            case WM_CLOSE: {
+                window->close_requested = mimas_true;
+                return 0;
+            } break;
+        }
+
+        return DefWindowProc(hwnd, msg, wparam, lparam);
     }
-
-    return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
 // Returns 1 if succeeded, 0 otherwise
@@ -543,6 +538,7 @@ mimas_bool mimas_platform_init() {
     platform->dummy_window = dummy_window;
 
     HWND const dummy_hwnd = ((Mimas_Win_Window*)dummy_window->native_window)->handle;
+    SetPropW(dummy_hwnd, L"global_input_handler", (HANDLE)mimas_true);
     // If the program is launched with STARTUPINFO, the first call to ShowWindow will ignore the nCmdShow param,
     //   therefore we call it here to clear that behaviour...
     ShowWindow(dummy_hwnd, SW_HIDE);
@@ -572,14 +568,14 @@ mimas_bool mimas_platform_init() {
         }
     }
 
-    // Install raw input listener 
+    // Install global raw input listener 
     RAWINPUTDEVICE rid[] = {
         {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
         {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
         {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_JOYSTICK, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd}
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
     };
-    RegisterRawInputDevices(rid, 4, sizeof(RAWINPUTDEVICE));
+    RegisterRawInputDevices(rid, ARRAY_SIZE(rid), sizeof(RAWINPUTDEVICE));
 
     return mimas_true;
 }
@@ -593,6 +589,15 @@ void mimas_platform_terminate(Mimas_Backend const backend) {
 
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas->platform;
+    HWND const dummy_hwnd = ((Mimas_Win_Window*)platform->dummy_window->native_window)->handle;
+    // Remove global raw input listener 
+    RAWINPUTDEVICE rid[] = {
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_REMOVE, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = RIDEV_REMOVE, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_JOYSTICK, .dwFlags = RIDEV_REMOVE, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_REMOVE, .hwndTarget = dummy_hwnd}
+    };
+    RegisterRawInputDevices(rid, 4, sizeof(RAWINPUTDEVICE));
     destroy_native_window(platform->dummy_window);
     unregister_window_class();
     free(platform);
@@ -608,7 +613,8 @@ void mimas_platform_poll_events() {
 }
 
 Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info const info) {
-    return create_native_window(info);
+    Mimas_Window* const window = create_native_window(info);
+    return window;
 }
 
 void mimas_platform_destroy_window(Mimas_Window* const window) {
