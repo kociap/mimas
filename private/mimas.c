@@ -55,7 +55,7 @@ Mimas_Callback mimas_get_window_cursor_pos_callback(Mimas_Window* window) {
     return (Mimas_Callback){(void*)window->callbacks.cursor_pos, window->callbacks.cursor_pos_data};
 }
 
-void mimas_set_window_mouse_button_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data) {
+void mimas_set_window_mouse_button_callback(Mimas_Window* window, mimas_window_mouse_button_callback callback, void* user_data) {
     window->callbacks.mouse_button = callback;
     window->callbacks.mouse_button_data = user_data;
 }

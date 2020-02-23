@@ -31,5 +31,12 @@ if(WIN32)
         target_compile_definitions(mimas PRIVATE MIMAS_BUILDING_DLL=1)
     endif()
 else()
-    message(FATAL "Unknown OS")
+    message(STATUS "Mimas compiled for linux")
+    target_sources(mimas
+            PRIVATE
+            "${CMAKE_CURRENT_SOURCE_DIR}/linux/x11/platform.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/linux/x11/vk.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/linux/x11/window.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/linux/x11/init.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/linux/x11/init.c")
 endif()
