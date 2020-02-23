@@ -226,7 +226,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
         case WM_SIZE: {
             // TODO: Handle minimmize separately? (This is specified in the wparam parameter)
-            if (window->callbacks.window_resize) {
+            if (window && window->callbacks.window_resize) {
                 window->callbacks.window_resize(window, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), 
                     window->callbacks.window_resize_data);
             }
