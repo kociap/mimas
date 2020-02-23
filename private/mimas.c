@@ -37,6 +37,15 @@ Mimas_Callback mimas_get_window_activate_callback(Mimas_Window* window) {
     return (Mimas_Callback){(void*)window->callbacks.window_activate, window->callbacks.window_activate_data};
 }
 
+void mimas_set_window_resize_callback(Mimas_Window* window, mimas_window_resize_callback callback, void* user_data) {
+    window->callbacks.window_resize = callback;
+    window->callbacks.window_resize_data = user_data;
+}
+
+Mimas_Callback mimas_get_window_resize_callback(Mimas_Window* window) {
+    return (Mimas_Callback){(void*)window->callbacks.window_resize, window->callbacks.window_resize_data};
+}
+
 void mimas_set_window_cursor_pos_callback(Mimas_Window* window, mimas_window_cursor_pos_callback callback, void* user_data) {
     window->callbacks.cursor_pos = callback;
     window->callbacks.cursor_pos_data = user_data;
