@@ -511,6 +511,7 @@ static Mimas_Window* create_native_window(Mimas_Window_Create_Info const info) {
 
 static void destroy_native_window(Mimas_Window* const window) {
     Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+    ReleaseDC(native_window->handle, native_window->hdc);
     DestroyWindow(native_window->handle);
     free(native_window);
     free(window);
