@@ -5,9 +5,16 @@
 #include <platform_vk.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 void mimas_terminate() {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    for(Mimas_Window_List_Element* elem = _mimas->window_list; elem != NULL;) {
+        mimas_platform_destroy_window(elem->window);
+        free(elem);
+        elem = elem->next;
+    }
+    _mimas->window_list = NULL;
     mimas_platform_terminate(_mimas->backend);
     _mimas_terminate_internal();
 }
@@ -17,11 +24,51 @@ void mimas_poll_events() {
 }
 
 Mimas_Window* mimas_create_window(Mimas_Window_Create_Info const info) {
-    return mimas_platform_create_window(info);
+    Mimas_Window_List_Element* const elem = (Mimas_Window_List_Element*)malloc(sizeof(Mimas_Window_List_Element));
+    if(!elem) {
+        // TODO: Error
+        return NULL;
+    }
+    memset(elem, 0, sizeof(Mimas_Window_List_Element));
+
+    Mimas_Window* window = mimas_platform_create_window(info);
+    if(!window) {
+        free(elem);
+        // TODO: Error
+        return NULL;
+    }
+
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    elem->window = window;
+    if(_mimas->window_list) {
+        Mimas_Window_List_Element* const next_elem = _mimas->window_list;
+        next_elem->prev = elem;
+        elem->next = next_elem;
+        _mimas->window_list = elem;
+    } else {
+        _mimas->window_list = elem;
+    }
+
+    return window;
 }
 
 void mimas_destroy_window(Mimas_Window* window) {
     mimas_platform_destroy_window(window);
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    Mimas_Window_List_Element* elem = _mimas->window_list;
+    while(elem->window != window) {
+        elem = elem->next;
+    }
+
+    if(elem->prev) {
+        elem->prev->next = elem->next;
+    }
+
+    if(elem->next) {
+        elem->next->prev = elem->prev;
+    }
+
+    free(elem);
 }
 
 mimas_bool mimas_close_requested(Mimas_Window* window) {

@@ -8,10 +8,17 @@ typedef enum Mimas_Backend {
     MIMAS_BACKEND_VK,
 } Mimas_Backend;
 
+typedef struct Mimas_Window_List_Element {
+    struct Mimas_Window_List_Element* prev;
+    struct Mimas_Window_List_Element* next;
+    Mimas_Window* window;
+} Mimas_Window_List_Element;
+
 typedef struct Mimas_Internal {
+    Mimas_Window* active_window;
+    Mimas_Window_List_Element* window_list;
     void* platform;
     Mimas_Backend backend;
-    Mimas_Window* active_window;
 } Mimas_Internal;
 
 void _mimas_init_internal(Mimas_Backend);

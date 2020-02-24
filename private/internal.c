@@ -14,6 +14,7 @@ void _mimas_init_internal(Mimas_Backend const backend) {
 
 void _mimas_terminate_internal() {
     free(_mimas);
+    _mimas = NULL;
 }
 
 mimas_bool _mimas_is_initialized() {
