@@ -207,12 +207,28 @@ typedef struct Mimas_Rect {
 typedef struct Mimas_Display Mimas_Display;
 typedef struct Mimas_Window Mimas_Window;
 
+typedef struct Mimas_Display_Settings {
+    mimas_i64 width;
+    mimas_i64 height;
+    mimas_i64 refresh_rate;
+} Mimas_Display_Settings;
+
 MIMAS_API void mimas_terminate();
 
 MIMAS_API void mimas_poll_events();
 
 MIMAS_API Mimas_Display* mimas_get_primary_display();
 MIMAS_API Mimas_Display** mimas_get_displays(mimas_i64* count);
+MIMAS_API Mimas_Display_Settings mimas_get_display_settings(Mimas_Display* display);
+
+// Makes a window non-exclusive fullscreen on given display.
+// If display is NULL, the window will be restored to normal mode. The window will not be restored to the previous size.
+//   If you want to restore the window to its previous size, store its size before you fullscreen the window. 
+//   After you restore the window to normal state, call mimas_set_window_content_size with the saved values.
+// The window will always be shown after this function finishes, but will not be active. 
+//   If you want to hide the widnow, see mimas_hide_window.
+//
+MIMAS_API void mimas_fullscreen_window(Mimas_Window* window, Mimas_Display* display);
 
 typedef struct Mimas_Window_Create_Info {
     mimas_i32 width;

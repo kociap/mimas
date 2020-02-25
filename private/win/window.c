@@ -15,11 +15,15 @@
 
 #include <hidusage.h>
 
-static mimas_u32 get_window_styles(Mimas_Window const* const window) {
+static mimas_u32 get_default_window_styles() {
     return WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 }
 
-static mimas_u32 get_window_extended_styles(Mimas_Window const* const window) {
+static mimas_u32 get_fullscreen_borderless_window_styles() {
+    return WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
+}
+
+static mimas_u32 get_default_extended_window_styles() {
     return WS_EX_APPWINDOW;
 }
 
@@ -46,6 +50,17 @@ static void enable_virtual_cursor(Mimas_Window* const window) {
 
 static void disable_virtual_cursor(Mimas_Window* const window) {
     release_captured_cursor();
+}
+
+static void fit_window_to_display(Mimas_Window* window, Mimas_Display* display) {
+    Mimas_Win_Display* const native_display = (Mimas_Win_Display*)display->native_display;
+    MONITORINFO info = { .cbSize = sizeof(MONITORINFO) };
+    GetMonitorInfoW(native_display->hmonitor, &info);
+    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+    SetWindowPos(native_window->handle, NULL, info.rcMonitor.left, info.rcMonitor.top, 
+                 info.rcMonitor.right - info.rcMonitor.left, 
+                 info.rcMonitor.bottom - info.rcMonitor.top, 
+                 SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOCOPYBITS);
 }
 
 static mimas_i32 window_hit_test(mimas_i32 const cursor_x, mimas_i32 const cursor_y, RECT const window_rect) {
@@ -296,6 +311,11 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
             } break;
 
             case WM_NCHITTEST: {
+                if(window->display) {
+                    // Do not run user-defined hittest on fullscreen windows.
+                    break;
+                }
+
                 RECT window_rect;
                 GetWindowRect(hwnd, &window_rect);
                 RECT client_rect;
@@ -620,6 +640,27 @@ void mimas_platform_poll_events() {
     }
 }
 
+void mimas_platform_fullscreen_window(Mimas_Window* const window, Mimas_Display* const display) {
+    if(display) {
+        window->display = display;
+        Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+        SetWindowLongPtrW(native_window->handle, GWL_STYLE, get_fullscreen_borderless_window_styles());
+        fit_window_to_display(window, display);
+        SetWindowPos(native_window->handle, HWND_TOP, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+        // For some reason changing window styles hides the window,
+        // so we force it to appear.
+        ShowWindow(native_window->handle, SW_SHOWNOACTIVATE);
+    } else if(window->display) {
+        window->display = NULL;
+        Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+        SetWindowLongPtrW(native_window->handle, GWL_STYLE, get_default_window_styles());
+        SetWindowPos(native_window->handle, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE);
+        // For some reason changing window styles hides the window,
+        // so we force it to appear.
+        ShowWindow(native_window->handle, SW_SHOWNOACTIVATE);
+    }
+}
+
 Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info const info) {
     Mimas_Window* const window = create_native_window(info);
     return window;
@@ -630,8 +671,10 @@ void mimas_platform_destroy_window(Mimas_Window* const window) {
 }
 
 void mimas_platform_set_window_pos(Mimas_Window* const window, mimas_i32 const x, mimas_i32 const y) {
-    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
-    SetWindowPos(native_window->handle, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
+    if(!window->display) {
+        Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+        SetWindowPos(native_window->handle, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
+    }
 }
 
 void mimas_platform_get_window_pos(Mimas_Window*const window, mimas_i32* const x, mimas_i32* const y) {
@@ -643,14 +686,16 @@ void mimas_platform_get_window_pos(Mimas_Window*const window, mimas_i32* const x
 }
 
 void mimas_platform_set_window_content_pos(Mimas_Window* const window, mimas_i32 const x, mimas_i32 const y) {
-    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
-    if(window->decorated) {
-        RECT pos = {x, y, x, y};
-        // TODO: Make DPI aware.
-        AdjustWindowRectEx(&pos, get_window_styles(window), FALSE, get_window_extended_styles(window));
-        SetWindowPos(native_window->handle, NULL, pos.left, pos.top, 0, 0, SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
-    } else {
-        SetWindowPos(native_window->handle, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
+    if(!window->display) {
+        Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+        if(window->decorated) {
+            RECT pos = {x, y, x, y};
+            // TODO: Make DPI aware.
+            AdjustWindowRectEx(&pos, get_default_window_styles(), FALSE, get_default_extended_window_styles());
+            SetWindowPos(native_window->handle, NULL, pos.left, pos.top, 0, 0, SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
+        } else {
+            SetWindowPos(native_window->handle, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
+        }
     }
 }
 
@@ -663,14 +708,16 @@ void mimas_platform_get_window_content_pos(Mimas_Window*const window, mimas_i32*
 }
 
 void mimas_platform_set_window_content_size(Mimas_Window*const window, mimas_i32 const width, mimas_i32 const height) {
-    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
-    if(window->decorated) {
-        RECT rect = {0, 0, width, height};
-        // TODO: Make DPI aware.
-        AdjustWindowRectEx(&rect, get_window_styles(window), FALSE, get_window_extended_styles(window));
-        SetWindowPos(native_window->handle, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
-    } else {
-        SetWindowPos(native_window->handle, NULL, 0, 0, width, height, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
+    if(!window->display) {
+        Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+        if(window->decorated) {
+            RECT rect = {0, 0, width, height};
+            // TODO: Make DPI aware.
+            AdjustWindowRectEx(&rect, get_default_window_styles(), FALSE, get_default_extended_window_styles());
+            SetWindowPos(native_window->handle, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
+        } else {
+            SetWindowPos(native_window->handle, NULL, 0, 0, width, height, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
+        }
     }
 }
 
