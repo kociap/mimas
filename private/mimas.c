@@ -23,6 +23,17 @@ void mimas_poll_events() {
     mimas_platform_poll_events();
 }
 
+Mimas_Display* mimas_get_primary_display() {
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    return _mimas->displays[0];
+}
+
+Mimas_Display** mimas_get_displays(mimas_i64* count) {
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    *count = _mimas->display_count;
+    return _mimas->displays;
+}
+
 Mimas_Window* mimas_create_window(Mimas_Window_Create_Info const info) {
     Mimas_Window_List_Element* const elem = (Mimas_Window_List_Element*)malloc(sizeof(Mimas_Window_List_Element));
     if(!elem) {

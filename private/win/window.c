@@ -518,16 +518,22 @@ static void destroy_native_window(Mimas_Window* const window) {
 }
 
 mimas_bool mimas_platform_init() {
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    _mimas->displays = _mimas_get_connected_displays(&_mimas->display_count);
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)malloc(sizeof(Mimas_Win_Platform));
+    if(!platform) {
+        // TODO: Error
+        return mimas_false;
+    }
     memset(platform, 0, sizeof(Mimas_Win_Platform));
+    _mimas->platform = platform;
 
     mimas_bool const register_res = register_window_class();
     if(!register_res) {
+        // TODO: Error
         return mimas_false;
     }
 
-    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    _mimas->platform = platform;
     Mimas_Window* const dummy_window = create_native_window((Mimas_Window_Create_Info){.width = 1280, .height = 720, .title = "MIMAS_HELPER_WINDOW", .decorated = mimas_false});
     if(!dummy_window) {
         unregister_window_class();
@@ -603,6 +609,7 @@ void mimas_platform_terminate(Mimas_Backend const backend) {
     unregister_window_class();
     free(platform);
     _mimas->platform = NULL;
+    _mimas_free_displays(_mimas->displays, _mimas->display_count);
 }
 
 void mimas_platform_poll_events() {
