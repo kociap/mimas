@@ -108,3 +108,13 @@ Mimas_Display** _mimas_get_connected_displays(mimas_i64* const count) {
     *count = display_count;
     return displays;
 }
+
+Mimas_Display_Settings mimas_platform_get_display_settings(Mimas_Display* display) {
+    Mimas_Win_Display* const native_display = (Mimas_Win_Display*)display->native_display;
+    WCHAR device_name[32] = {0};
+    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, native_display->adapter_name, -1, device_name, 32);
+    DEVMODEW devmode = {0};
+    EnumDisplaySettingsW(device_name, ENUM_CURRENT_SETTINGS, &devmode);
+    Mimas_Display_Settings settings = { .width = devmode.dmPelsWidth, .height = devmode.dmPelsHeight, .refresh_rate = devmode.dmDisplayFrequency };
+    return settings;
+}

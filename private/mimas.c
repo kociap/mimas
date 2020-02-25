@@ -34,6 +34,14 @@ Mimas_Display** mimas_get_displays(mimas_i64* count) {
     return _mimas->displays;
 }
 
+Mimas_Display_Settings mimas_get_display_settings(Mimas_Display* display) {
+    return mimas_platform_get_display_settings(display);
+}
+
+void mimas_fullscreen_window(Mimas_Window* window, Mimas_Display* display) {
+    mimas_platform_fullscreen_window(window, display);
+}
+
 Mimas_Window* mimas_create_window(Mimas_Window_Create_Info const info) {
     Mimas_Window_List_Element* const elem = (Mimas_Window_List_Element*)malloc(sizeof(Mimas_Window_List_Element));
     if(!elem) {
