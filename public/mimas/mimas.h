@@ -204,11 +204,15 @@ typedef struct Mimas_Rect {
     mimas_i32 right;
 } Mimas_Rect;
 
+typedef struct Mimas_Display Mimas_Display;
 typedef struct Mimas_Window Mimas_Window;
 
 MIMAS_API void mimas_terminate();
 
 MIMAS_API void mimas_poll_events();
+
+MIMAS_API Mimas_Display* mimas_get_primary_display();
+MIMAS_API Mimas_Display** mimas_get_displays(mimas_i64* count);
 
 typedef struct Mimas_Window_Create_Info {
     mimas_i32 width;
