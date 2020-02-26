@@ -23,3 +23,15 @@ void mimas_destroy_gl_context(Mimas_GL_Context* const ctx) {
 mimas_bool mimas_make_context_current(Mimas_Window* const window, Mimas_GL_Context* const ctx) {
     return mimas_platform_make_context_current(window, ctx);
 }
+
+void mimas_swap_buffers(Mimas_Window* const window) {
+    mimas_platform_swap_buffers(window);
+}
+
+void mimas_set_swap_interval(mimas_i32 const interval) {
+    mimas_platform_set_swap_interval(interval);
+}
+
+mimas_i32 mimas_get_swap_interval() {
+    return mimas_platform_get_swap_interval();
+}

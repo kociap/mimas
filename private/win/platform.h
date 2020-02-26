@@ -18,6 +18,7 @@
 typedef struct Mimas_Win_Window {
     HWND handle;
     HDC hdc;
+    mimas_bool non_client_activate;
 } Mimas_Win_Window;
 
 typedef struct Mimas_Win_Display {

@@ -16,6 +16,8 @@ typedef struct Mimas_Window_List_Element {
 
 typedef struct Mimas_Internal {
     Mimas_Window* active_window;
+    Mimas_Window* clipped_cursor_window;
+    Mimas_Window* virtual_cursor_window;
     Mimas_Window_List_Element* window_list;
     Mimas_Display** displays;
     mimas_i64 display_count;
@@ -37,10 +39,14 @@ struct Mimas_Display {
 struct Mimas_Window {
     mimas_bool decorated;
     mimas_bool close_requested;
-    Mimas_Cursor_Mode cursor_mode;
     Mimas_Display* display;
     void* native_window;
     Mimas_Key_Action keys[256];
+    mimas_i32 cursor_virtual_pos_x;
+    mimas_i32 cursor_virtual_pos_y;
+    mimas_bool cursor_clipped;
+    Mimas_Rect clip_region;
+    mimas_bool cursor_virtual;
 
     struct {
         mimas_window_activate_callback window_activate;
@@ -53,6 +59,8 @@ struct Mimas_Window {
         void* mouse_button_data;
         mimas_window_key_callback key;
         void* key_data;
+        mimas_window_close_requested close_requested;
+        void* close_requested_data;
         mimas_window_hittest hittest;
     } callbacks;
 };

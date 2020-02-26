@@ -191,12 +191,6 @@ typedef enum Mimas_Hittest_Result {
     MIMAS_HITTEST_NOWHERE,
 } Mimas_Hittest_Result;
 
-typedef enum Mimas_Cursor_Mode {
-    MIMAS_CURSOR_NORMAL,
-    MIMAS_CURSOR_CAPTURED,
-    MIMAS_CURSOR_VIRTUAL,
-} Mimas_Cursor_Mode;
-
 typedef struct Mimas_Rect {
     mimas_i32 left;
     mimas_i32 top;
@@ -271,6 +265,10 @@ typedef void (*mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, M
 MIMAS_API void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_key_callback(Mimas_Window* window);
 
+typedef void(*mimas_window_close_requested)(Mimas_Window* window, void* user_data);
+MIMAS_API void mimas_set_window_close_requested_callback(Mimas_Window* window, void* user_data);
+MIMAS_API Mimas_Callback mimas_get_window_close_requested_callback(Mimas_Window* window);
+
 // Set custom hit function for the native window to define custom resize, drag, minimize, maximize and close behaviour.
 //
 typedef Mimas_Hittest_Result (*mimas_window_hittest)(Mimas_Window* window, mimas_i32 cursor_x, mimas_i32 cursor_y, Mimas_Rect window_rect, Mimas_Rect client_rect);
@@ -291,8 +289,19 @@ MIMAS_API void mimas_restore_window(Mimas_Window* window);
 MIMAS_API void mimas_minimize_window(Mimas_Window* window);
 MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 
-MIMAS_API void mimas_set_cursor_mode(Mimas_Window* window, Mimas_Cursor_Mode);
+// Confines the cursor to an area inside window defined by region.
+//
+// region is in screen coordinates relative to top-left corner of the client area of the window
+// and will be cropped so that it doesn't extend outside the window. 
+// If region is NULL, the cursor will be released.
+//
+MIMAS_API void mimas_clip_cursor(Mimas_Window* window, Mimas_Rect const* region);
+
+MIMAS_API void mimas_enable_virtual_cursor(Mimas_Window* const window);
+MIMAS_API void mimas_disable_virtual_cursor(Mimas_Window* const window);
+
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
+MIMAS_API void mimas_set_cursor_pos(mimas_i32 const x, mimas_i32 const y);
 
 // Returns: MIMAS_KEY_RELEASE when the key is released, MIMAS_KEY_PRESS when the key is pressed.
 //

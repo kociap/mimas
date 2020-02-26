@@ -196,20 +196,20 @@ void mimas_maximize_window(Mimas_Window* const window) {
     mimas_platform_maximize_window(window);
 }
 
-void mimas_swap_buffers(Mimas_Window* const window) {
-    mimas_platform_swap_buffers(window);
+void mimas_clip_cursor(Mimas_Window* const window, Mimas_Rect const* const region) {
+    mimas_platform_clip_cursor(window, region);
 }
 
-void mimas_set_swap_interval(mimas_i32 const interval) {
-    mimas_platform_set_swap_interval(interval);
+void mimas_enable_virtual_cursor(Mimas_Window* const window) {
+    mimas_platform_enable_virtual_cursor(window);
 }
 
-mimas_i32 mimas_get_swap_interval() {
-    return mimas_platform_get_swap_interval();
+void mimas_disable_virtual_cursor(Mimas_Window* const window) {
+    mimas_platform_disable_virtual_cursor(window);
 }
 
-void mimas_set_cursor_mode(Mimas_Window* const window, Mimas_Cursor_Mode const cursor_mode) {
-    mimas_platform_set_cursor_mode(window, cursor_mode);
+void mimas_set_cursor_pos(mimas_i32 const x, mimas_i32 const y) {
+    mimas_platform_set_cursor_pos(x, y);
 }
 
 void mimas_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
