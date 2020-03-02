@@ -23,7 +23,7 @@ typedef enum VkResult {
 
 mimas_bool mimas_platform_init_vk_backend();
 void mimas_platform_terminate_vk_backend();
-char const** mimas_platform_get_vk_extensions();
+char const** mimas_platform_get_vk_extensions(mimas_i32* extension_count);
 VkResult mimas_platform_create_vk_surface(Mimas_Window*, VkInstance, struct VkAllocationCallbacks const*, VkSurfaceKHR*);
 
 #endif // !MIMAS_PLATFORM_VK_H_INCLUDE

@@ -33,8 +33,9 @@ void mimas_platform_terminate_vk_backend() {
     FreeLibrary(vulkan_module);
 }
 
-char const** mimas_platform_get_vk_extensions() {
+char const** mimas_platform_get_vk_extensions(mimas_i32* extension_count) {
     static char const* vk_win_extensions[] = {"VK_KHR_surface", "VK_KHR_win32_surface", NULL};
+    *extension_count = 2;
     return vk_win_extensions;
 }
 
