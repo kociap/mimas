@@ -297,8 +297,8 @@ MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 //
 MIMAS_API void mimas_clip_cursor(Mimas_Window* window, Mimas_Rect const* region);
 
-MIMAS_API void mimas_enable_virtual_cursor(Mimas_Window* window);
-MIMAS_API void mimas_disable_virtual_cursor(Mimas_Window* window);
+MIMAS_API void mimas_lock_cursor(Mimas_Window* window);
+MIMAS_API void mimas_unlock_cursor(Mimas_Window* window);
 
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 MIMAS_API void mimas_set_cursor_pos(mimas_i32 x, mimas_i32 y);

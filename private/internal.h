@@ -46,7 +46,7 @@ struct Mimas_Window {
     mimas_i32 cursor_virtual_pos_y;
     mimas_bool cursor_clipped;
     Mimas_Rect clip_region;
-    mimas_bool cursor_virtual;
+    mimas_bool cursor_locked;
 
     struct {
         mimas_window_activate_callback window_activate;

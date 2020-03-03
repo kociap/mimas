@@ -200,12 +200,12 @@ void mimas_clip_cursor(Mimas_Window* const window, Mimas_Rect const* const regio
     mimas_platform_clip_cursor(window, region);
 }
 
-void mimas_enable_virtual_cursor(Mimas_Window* const window) {
-    mimas_platform_enable_virtual_cursor(window);
+void mimas_lock_cursor(Mimas_Window* const window) {
+    mimas_platform_lock_cursor(window);
 }
 
-void mimas_disable_virtual_cursor(Mimas_Window* const window) {
-    mimas_platform_disable_virtual_cursor(window);
+void mimas_unlock_cursor(Mimas_Window* const window) {
+    mimas_platform_unlock_cursor(window);
 }
 
 void mimas_set_cursor_pos(mimas_i32 const x, mimas_i32 const y) {
