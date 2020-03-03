@@ -30,7 +30,7 @@ static LPWSTR mimas_cursor_to_win_cursor(Mimas_Standard_Cursor const cursor) {
 }
 
 Mimas_Cursor* mimas_platform_create_standard_cursor(Mimas_Standard_Cursor const cursor) {
-    return (Mimas_Cursor*)LoadImageW(NULL, mimas_cursor_to_win_cursor(cursor), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE);
+    return (Mimas_Cursor*)LoadImageW(NULL, mimas_cursor_to_win_cursor(cursor), IMAGE_CURSOR, 0, 0, LR_SHARED | LR_DEFAULTSIZE);
 }
 
 void mimas_platform_destroy_cursor(Mimas_Cursor* cursor) {
