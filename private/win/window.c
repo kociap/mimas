@@ -420,6 +420,14 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                 }
             } break;
 
+            case WM_SETCURSOR: {
+                if(LOWORD(lparam) == HTCLIENT) {
+                    mimas_platform_set_cursor(window->cursor);
+                    return TRUE;
+                }
+
+            } break;
+
             case WM_SIZE: {
                 // TODO: Handle minimmize separately? (This is specified in the wparam parameter)
                 if (window && window->callbacks.window_resize) {
@@ -556,6 +564,8 @@ static Mimas_Window* create_native_window(Mimas_Window_Create_Info const info) {
         SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER);
     }
 
+    window->cursor = _mimas->default_cursor;
+
     return window;
 }
 
@@ -625,6 +635,8 @@ mimas_bool mimas_platform_init() {
         }
     }
 
+    _mimas->default_cursor = mimas_platform_create_standard_cursor(MIMAS_CURSOR_ARROW);
+
     // Install global raw input listener 
     RAWINPUTDEVICE rid[] = {
         {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
@@ -655,6 +667,7 @@ void mimas_platform_terminate(Mimas_Backend const backend) {
         {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_REMOVE, .hwndTarget = dummy_hwnd}
     };
     RegisterRawInputDevices(rid, 4, sizeof(RAWINPUTDEVICE));
+    mimas_platform_destroy_cursor(_mimas->default_cursor);
     destroy_native_window(platform->dummy_window);
     unregister_window_class();
     free(platform);

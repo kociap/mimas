@@ -289,6 +289,10 @@ MIMAS_API void mimas_restore_window(Mimas_Window* window);
 MIMAS_API void mimas_minimize_window(Mimas_Window* window);
 MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 
+// Returns: MIMAS_KEY_RELEASE when the key is released, MIMAS_KEY_PRESS when the key is pressed.
+//
+MIMAS_API Mimas_Key_Action mimas_get_key(Mimas_Key key);
+
 // Confines the cursor to an area inside window defined by region.
 //
 // region is in screen coordinates relative to top-left corner of the client area of the window
@@ -303,9 +307,26 @@ MIMAS_API void mimas_unlock_cursor(Mimas_Window* window);
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 MIMAS_API void mimas_set_cursor_pos(mimas_i32 x, mimas_i32 y);
 
-// Returns: MIMAS_KEY_RELEASE when the key is released, MIMAS_KEY_PRESS when the key is pressed.
+typedef enum Mimas_Standard_Cursor {
+    MIMAS_CURSOR_ARROW,
+    MIMAS_CURSOR_RESIZE_RIGHT,
+    MIMAS_CURSOR_RESIZE_LEFT,
+    MIMAS_CURSOR_RESIZE_TOP,
+    MIMAS_CURSOR_RESIZE_BOTTOM,
+    MIMAS_CURSOR_RESIZE_TOP_LEFT,
+    MIMAS_CURSOR_RESIZE_TOP_RIGHT,
+    MIMAS_CURSOR_RESIZE_BOTTOM_LEFT,
+    MIMAS_CURSOR_RESIZE_BOTTOM_RIGHT,
+} Mimas_Standard_Cursor;
+
+typedef struct Mimas_Cursor Mimas_Cursor;
+
+MIMAS_API Mimas_Cursor* mimas_create_standard_cursor(Mimas_Standard_Cursor cursor);
+MIMAS_API void mimas_destroy_cursor(Mimas_Cursor* cursor);
+
+// If cursor is NULL, the system cursor will be hidden.
 //
-MIMAS_API Mimas_Key_Action mimas_get_key(Mimas_Key key);
+MIMAS_API void mimas_set_cursor(Mimas_Cursor* cursor);
 
 MIMAS_EXTERN_C_END
 

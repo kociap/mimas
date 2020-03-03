@@ -23,6 +23,7 @@ typedef struct Mimas_Internal {
     mimas_i64 display_count;
     void* platform;
     Mimas_Backend backend;
+    Mimas_Cursor* default_cursor;
 } Mimas_Internal;
 
 void _mimas_init_internal(Mimas_Backend);
@@ -47,6 +48,7 @@ struct Mimas_Window {
     mimas_bool cursor_clipped;
     Mimas_Rect clip_region;
     mimas_bool cursor_locked;
+    Mimas_Cursor* cursor;
 
     struct {
         mimas_window_activate_callback window_activate;

@@ -196,6 +196,10 @@ void mimas_maximize_window(Mimas_Window* const window) {
     mimas_platform_maximize_window(window);
 }
 
+Mimas_Key_Action mimas_get_key(Mimas_Key const key) {
+    return mimas_platform_get_key(key);
+}
+
 void mimas_clip_cursor(Mimas_Window* const window, Mimas_Rect const* const region) {
     mimas_platform_clip_cursor(window, region);
 }
@@ -216,6 +220,14 @@ void mimas_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
     mimas_platform_get_cursor_pos(x, y);
 }
 
-Mimas_Key_Action mimas_get_key(Mimas_Key const key) {
-    return mimas_platform_get_key(key);
+Mimas_Cursor* mimas_create_standard_cursor(Mimas_Standard_Cursor cursor) {
+    return mimas_platform_create_standard_cursor(cursor);
+}
+
+void mimas_destroy_cursor(Mimas_Cursor* cursor) {
+    mimas_platform_destroy_cursor(cursor);
+}
+
+void mimas_set_cursor(Mimas_Cursor* cursor) {
+    mimas_platform_set_cursor(cursor);
 }

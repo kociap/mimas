@@ -28,11 +28,16 @@ void mimas_platform_restore_window(Mimas_Window*);
 void mimas_platform_minimize_window(Mimas_Window*);
 void mimas_platform_maximize_window(Mimas_Window*);
 
+Mimas_Key_Action mimas_platform_get_key(Mimas_Key button);
+
 void mimas_platform_clip_cursor(Mimas_Window* window, Mimas_Rect const* region);
 void mimas_platform_lock_cursor(Mimas_Window* const window);
 void mimas_platform_unlock_cursor(Mimas_Window* const window);
 void mimas_platform_set_cursor_pos(mimas_i32 const x, mimas_i32 const y);
 void mimas_platform_get_cursor_pos(mimas_i32* x, mimas_i32* y);
-Mimas_Key_Action mimas_platform_get_key(Mimas_Key button);
+Mimas_Cursor* mimas_platform_create_standard_cursor(Mimas_Standard_Cursor cursor);
+void mimas_platform_destroy_cursor(Mimas_Cursor* cursor);
+void mimas_platform_set_cursor(Mimas_Cursor* cursor);
+
 
 #endif // !MIMAS_MIMAS_PLATFORM_H_INCLUDE
