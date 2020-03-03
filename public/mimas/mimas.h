@@ -194,8 +194,8 @@ typedef enum Mimas_Hittest_Result {
 typedef struct Mimas_Rect {
     mimas_i32 left;
     mimas_i32 top;
-    mimas_i32 bottom;
     mimas_i32 right;
+    mimas_i32 bottom;
 } Mimas_Rect;
 
 typedef struct Mimas_Display Mimas_Display;
@@ -297,11 +297,11 @@ MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 //
 MIMAS_API void mimas_clip_cursor(Mimas_Window* window, Mimas_Rect const* region);
 
-MIMAS_API void mimas_enable_virtual_cursor(Mimas_Window* const window);
-MIMAS_API void mimas_disable_virtual_cursor(Mimas_Window* const window);
+MIMAS_API void mimas_enable_virtual_cursor(Mimas_Window* window);
+MIMAS_API void mimas_disable_virtual_cursor(Mimas_Window* window);
 
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
-MIMAS_API void mimas_set_cursor_pos(mimas_i32 const x, mimas_i32 const y);
+MIMAS_API void mimas_set_cursor_pos(mimas_i32 x, mimas_i32 y);
 
 // Returns: MIMAS_KEY_RELEASE when the key is released, MIMAS_KEY_PRESS when the key is pressed.
 //

@@ -16,10 +16,10 @@ inline mimas_i32 max_i32(mimas_i32 x, mimas_i32 y) {
 
 inline Mimas_Rect crop_rect(Mimas_Rect const* const source, Mimas_Rect const* const target) {
     Mimas_Rect cropped = {
-        cropped.left = min_i32(max_i32(target->left, source->left), target->right),
-        cropped.right = min_i32(max_i32(target->left, source->right), target->right),
-        cropped.top = min_i32(max_i32(target->top, source->top), target->bottom),
-        cropped.bottom = min_i32(max_i32(target->top, source->bottom), target->bottom)
+        .left = min_i32(max_i32(target->left, source->left), target->right),
+        .right = min_i32(max_i32(target->left, source->right), target->right),
+        .top = min_i32(max_i32(target->top, source->top), target->bottom),
+        .bottom = min_i32(max_i32(target->top, source->bottom), target->bottom)
     };
     return cropped;
 }
