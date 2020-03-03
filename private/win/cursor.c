@@ -37,6 +37,6 @@ void mimas_platform_destroy_cursor(Mimas_Cursor* cursor) {
     DestroyCursor((HCURSOR)cursor);
 }
 
-void mimas_platform_set_cursor(Mimas_Cursor* cursor) {
-    SetCursor((HCURSOR)cursor);
+void mimas_platform_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor) {
+    window->cursor = cursor;
 }

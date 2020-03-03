@@ -228,6 +228,6 @@ void mimas_destroy_cursor(Mimas_Cursor* cursor) {
     mimas_platform_destroy_cursor(cursor);
 }
 
-void mimas_set_cursor(Mimas_Cursor* cursor) {
-    mimas_platform_set_cursor(cursor);
+void mimas_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor) {
+    mimas_platform_set_cursor(window, cursor);
 }

@@ -422,7 +422,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
             case WM_SETCURSOR: {
                 if(LOWORD(lparam) == HTCLIENT) {
-                    mimas_platform_set_cursor(window->cursor);
+                    SetCursor((HCURSOR)window->cursor);
                     return TRUE;
                 }
 

@@ -37,7 +37,7 @@ void mimas_platform_set_cursor_pos(mimas_i32 const x, mimas_i32 const y);
 void mimas_platform_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 Mimas_Cursor* mimas_platform_create_standard_cursor(Mimas_Standard_Cursor cursor);
 void mimas_platform_destroy_cursor(Mimas_Cursor* cursor);
-void mimas_platform_set_cursor(Mimas_Cursor* cursor);
+void mimas_platform_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor);
 
 
 #endif // !MIMAS_MIMAS_PLATFORM_H_INCLUDE

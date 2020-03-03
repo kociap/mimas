@@ -326,7 +326,7 @@ MIMAS_API void mimas_destroy_cursor(Mimas_Cursor* cursor);
 
 // If cursor is NULL, the system cursor will be hidden.
 //
-MIMAS_API void mimas_set_cursor(Mimas_Cursor* cursor);
+MIMAS_API void mimas_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor);
 
 MIMAS_EXTERN_C_END
 
