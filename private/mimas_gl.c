@@ -3,7 +3,7 @@
 #include <platform_gl.h>
 #include <platform.h>
 
-mimas_bool mimas_init_with_gl() {
+mimas_bool mimas_init_with_gl(void) {
     _mimas_init_internal(MIMAS_BACKEND_GL);
     mimas_bool const res = mimas_platform_init(MIMAS_BACKEND_GL);
     if(!res) {
@@ -32,6 +32,6 @@ void mimas_set_swap_interval(mimas_i32 const interval) {
     mimas_platform_set_swap_interval(interval);
 }
 
-mimas_i32 mimas_get_swap_interval() {
+mimas_i32 mimas_get_swap_interval(void) {
     return mimas_platform_get_swap_interval();
 }

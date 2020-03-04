@@ -9,7 +9,7 @@ typedef struct VkInstance_T* VkInstance;
 typedef struct VkSurfaceKHR_T* VkSurfaceKHR;
 struct VkAllocationCallbacks;
 
-MIMAS_API mimas_bool mimas_init_with_vk();
+MIMAS_API mimas_bool mimas_init_with_vk(void);
 
 /*
  * Returns: A NULL terminated list of vk extension names.
@@ -19,7 +19,7 @@ MIMAS_API char const** mimas_get_vk_extensions(mimas_i32* extension_count);
 /*
  * Returns: VK_SUCCESS on success, VK_ERROR_OUT_OF_HOST_MEMORY or VK_ERROR_OUT_OF_DEVICE_MEMORY on failure.
  */
-mimas_i32 mimas_create_vk_surface(Mimas_Window*, VkInstance, struct VkAllocationCallbacks const*, VkSurfaceKHR*);
+mimas_i32 mimas_create_vk_surface(Mimas_Window* window, VkInstance vkinstance, struct VkAllocationCallbacks const* vkallocationcallbacks, VkSurfaceKHR* vksurface);
 
 MIMAS_EXTERN_C_END
 

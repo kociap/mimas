@@ -8,21 +8,21 @@
 #include <mimas/mimas.h>
 
 // Assumes pixel format is already set on the given HDC.
-mimas_bool mimas_load_wgl(HDC);
-void mimas_unload_wgl();
+mimas_bool mimas_load_wgl(HDC hdc);
+void mimas_unload_wgl(void);
 
-typedef char const* (*PFN_wglGetExtensionsStringARB)(HDC);
+typedef char const* (*PFN_wglGetExtensionsStringARB)(HDC hdc);
 extern PFN_wglGetExtensionsStringARB mimas_wglGetExtensionsStringARB;
 #define wglGetExtensionsStringARB mimas_wglGetExtensionsStringARB;
 
 
-typedef HGLRC (*PFN_wglCreateContext)(HDC);
+typedef HGLRC (*PFN_wglCreateContext)(HDC hdc);
 typedef BOOL (*PFN_wglDeleteContext)(HGLRC);
-typedef HDC(*PFN_wglGetCurrentDC)();
-typedef HGLRC(*PFN_wglGetCurrentContext)();
-typedef BOOL (*PFN_wglMakeCurrent)(HDC, HGLRC);
-typedef BOOL (*PFN_wglShareLists)(HGLRC, HGLRC);
-typedef void (*PFN_wglSwapBuffers)(HDC);
+typedef HDC(*PFN_wglGetCurrentDC)(void);
+typedef HGLRC(*PFN_wglGetCurrentContext)(void);
+typedef BOOL (*PFN_wglMakeCurrent)(HDC hdc, HGLRC hglrc);
+typedef BOOL (*PFN_wglShareLists)(HGLRC hglrc1, HGLRC hglrc2);
+typedef void (*PFN_wglSwapBuffers)(HDC hdc);
 extern PFN_wglCreateContext mimas_wglCreateContext;
 extern PFN_wglDeleteContext mimas_wglDeleteContext;
 extern PFN_wglGetCurrentDC mimas_wglGetCurrentDC;

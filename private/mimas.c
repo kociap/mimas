@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void mimas_terminate() {
+void mimas_terminate(void) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     for(Mimas_Window_List_Element* elem = _mimas->window_list; elem != NULL;) {
         mimas_platform_destroy_window(elem->window);
@@ -19,11 +19,11 @@ void mimas_terminate() {
     _mimas_terminate_internal();
 }
 
-void mimas_poll_events() {
+void mimas_poll_events(void) {
     mimas_platform_poll_events();
 }
 
-Mimas_Display* mimas_get_primary_display() {
+Mimas_Display* mimas_get_primary_display(void) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     return _mimas->displays[0];
 }

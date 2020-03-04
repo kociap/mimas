@@ -69,7 +69,7 @@ mimas_bool mimas_load_wgl(HDC const hdc) {
     }
 }
 
-void mimas_unload_wgl() {
+void mimas_unload_wgl(void) {
     mimas_wglGetProcAddress = NULL;
     mimas_wglGetExtensionsStringARB = NULL;
     mimas_wglCreateContextAttribsARB = NULL;

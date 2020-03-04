@@ -27,9 +27,9 @@ typedef struct Mimas_Internal {
 } Mimas_Internal;
 
 void _mimas_init_internal(Mimas_Backend);
-void _mimas_terminate_internal();
-mimas_bool _mimas_is_initialized();
-Mimas_Internal* _mimas_get_mimas_internal();
+void _mimas_terminate_internal(void);
+mimas_bool _mimas_is_initialized(void);
+Mimas_Internal* _mimas_get_mimas_internal(void);
 
 // typedef in mimas/mimas.h
 struct Mimas_Display {

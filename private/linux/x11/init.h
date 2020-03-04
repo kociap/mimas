@@ -32,6 +32,6 @@ extern PFN_XCloseDisplay mimas_XCloseDisplay;
 extern PFN_XStoreName mimas_XStoreName;
 extern PFN_XSetIconName mimas_XSetIconName;
 
-mimas_bool mimas_load_x11();
+mimas_bool mimas_load_x11(void);
 
 #endif //MIMAS_INIT_H

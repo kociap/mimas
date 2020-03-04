@@ -5,7 +5,7 @@
 
 #include <wingdi.h>
 
-mimas_bool mimas_platform_init_gl_backend() {
+mimas_bool mimas_platform_init_gl_backend(void) {
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
     Mimas_Win_Window* const dummy_window = (Mimas_Win_Window*)platform->dummy_window->native_window;
     if(!mimas_load_wgl(dummy_window->hdc)) {
@@ -15,7 +15,7 @@ mimas_bool mimas_platform_init_gl_backend() {
     return mimas_true;
 }
 
-void mimas_platform_terminate_gl_backend() {
+void mimas_platform_terminate_gl_backend(void) {
     mimas_unload_wgl();
 }
 
@@ -52,6 +52,6 @@ void mimas_platform_set_swap_interval(mimas_i32 const interval) {
     wglSwapIntervalEXT(interval);
 }
 
-mimas_i32 mimas_platform_get_swap_interval() {
+mimas_i32 mimas_platform_get_swap_interval(void) {
     return wglGetSwapIntervalEXT();
 }

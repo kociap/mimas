@@ -12,15 +12,15 @@ void _mimas_init_internal(Mimas_Backend const backend) {
     _mimas->backend = backend;
 }
 
-void _mimas_terminate_internal() {
+void _mimas_terminate_internal(void) {
     free(_mimas);
     _mimas = NULL;
 }
 
-mimas_bool _mimas_is_initialized() {
+mimas_bool _mimas_is_initialized(void) {
     return _mimas != NULL;
 }
 
-Mimas_Internal* _mimas_get_mimas_internal() {
+Mimas_Internal* _mimas_get_mimas_internal(void) {
     return _mimas;
 }

@@ -3,7 +3,7 @@
 #include <platform_vk.h>
 #include <platform.h>
 
-mimas_bool mimas_init_with_vk() {
+mimas_bool mimas_init_with_vk(void) {
     _mimas_init_internal(MIMAS_BACKEND_VK);
     mimas_bool const res =  mimas_platform_init(MIMAS_BACKEND_VK);
     if(!res) {

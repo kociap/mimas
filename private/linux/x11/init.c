@@ -15,7 +15,7 @@ PFN_XCloseDisplay mimas_XCloseDisplay;
 PFN_XStoreName mimas_XStoreName;
 PFN_XSetIconName mimas_XSetIconName;
 
-mimas_bool mimas_load_x11() {
+mimas_bool mimas_load_x11(void) {
     void* x11_module = dlopen("libx11.so.6", RTLD_LOCAL | RTLD_LAZY);
 
     if (!x11_module) {

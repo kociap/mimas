@@ -20,7 +20,7 @@ static PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
 
 typedef VkResult (*PFN_vkCreateXlibSurfaceKHR)(VkInstance, VkXlibSurfaceCreateInfoKHR const*, struct VkAllocationCallbacks const*, VkSurfaceKHR*);
 
-mimas_bool mimas_platform_init_vk_backend() {
+mimas_bool mimas_platform_init_vk_backend(void) {
     vulkan_module = dlopen("vulkan.so", RTLD_LAZY | RTLD_LOCAL);
     if (vulkan_module) {
         vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)dlsym(vulkan_module, "vkGetInstanceProcAddr");
@@ -31,7 +31,7 @@ mimas_bool mimas_platform_init_vk_backend() {
     }
 }
 
-void mimas_platform_terminate_vk_backend() {
+void mimas_platform_terminate_vk_backend(void) {
     dlclose(vulkan_module);
 }
 

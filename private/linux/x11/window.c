@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdio.h>
 
-void mimas_terminate() {
+void mimas_terminate(void) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     mimas_platform_terminate(_mimas->backend);
     _mimas_terminate_internal();

@@ -207,11 +207,11 @@ typedef struct Mimas_Display_Settings {
     mimas_i64 refresh_rate;
 } Mimas_Display_Settings;
 
-MIMAS_API void mimas_terminate();
+MIMAS_API void mimas_terminate(void);
 
-MIMAS_API void mimas_poll_events();
+MIMAS_API void mimas_poll_events(void);
 
-MIMAS_API Mimas_Display* mimas_get_primary_display();
+MIMAS_API Mimas_Display* mimas_get_primary_display(void);
 MIMAS_API Mimas_Display** mimas_get_displays(mimas_i64* count);
 MIMAS_API Mimas_Display_Settings mimas_get_display_settings(Mimas_Display* display);
 

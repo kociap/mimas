@@ -15,15 +15,15 @@
 
 #include <hidusage.h>
 
-static mimas_u32 get_default_window_styles() {
+static mimas_u32 get_default_window_styles(void) {
     return WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 }
 
-static mimas_u32 get_fullscreen_borderless_window_styles() {
+static mimas_u32 get_fullscreen_borderless_window_styles(void) {
     return WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
 }
 
-static mimas_u32 get_default_extended_window_styles() {
+static mimas_u32 get_default_extended_window_styles(void) {
     return WS_EX_APPWINDOW;
 }
 
@@ -489,7 +489,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 }
 
 // Returns 1 if succeeded, 0 otherwise
-static mimas_bool register_window_class() {
+static mimas_bool register_window_class(void) {
     WNDCLASSEX wndclass = {
         .cbSize = sizeof(WNDCLASSEX),
         .style = CS_HREDRAW | CS_VREDRAW,
@@ -503,7 +503,7 @@ static mimas_bool register_window_class() {
 }
 
 // Returns 1 if succeeded, 0 otherwise.
-static mimas_bool unregister_window_class() {
+static mimas_bool unregister_window_class(void) {
     return UnregisterClass(MIMAS_WINDOW_CLASS_NAME, NULL);
 }
 
@@ -577,7 +577,7 @@ static void destroy_native_window(Mimas_Window* const window) {
     free(window);
 }
 
-mimas_bool mimas_platform_init() {
+mimas_bool mimas_platform_init(Mimas_Backend const backend) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     _mimas->displays = _mimas_get_connected_displays(&_mimas->display_count);
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)malloc(sizeof(Mimas_Win_Platform));
@@ -618,7 +618,7 @@ mimas_bool mimas_platform_init() {
         DispatchMessageW(&msg);
     }
 
-    if(_mimas->backend == MIMAS_BACKEND_GL) {
+    if(backend == MIMAS_BACKEND_GL) {
         if(!mimas_platform_init_gl_backend()) {
             destroy_native_window(dummy_window);
             unregister_window_class();
@@ -675,7 +675,7 @@ void mimas_platform_terminate(Mimas_Backend const backend) {
     _mimas_free_displays(_mimas->displays, _mimas->display_count);
 }
 
-void mimas_platform_poll_events() {
+void mimas_platform_poll_events(void) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     MSG msg;
     while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
