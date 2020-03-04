@@ -14,6 +14,10 @@ void mimas_platform_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
 }
 
 Mimas_Key_Action mimas_platform_get_key(Mimas_Key const key) {
-    Mimas_Win_Platform const* platform = (Mimas_Win_Platform const*)_mimas_get_mimas_internal()->platform;
-    return platform->key_state[key];
+    if(key == MIMAS_KEY_UNKNOWN) {
+        return MIMAS_KEY_RELEASE;
+    } else {
+        Mimas_Win_Platform const* platform = (Mimas_Win_Platform const*)_mimas_get_mimas_internal()->platform;
+        return platform->key_state[key];
+    }
 }
