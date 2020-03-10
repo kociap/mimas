@@ -79,12 +79,16 @@ void mimas_destroy_window(Mimas_Window* window) {
         elem = elem->next;
     }
 
-    if(elem->prev) {
-        elem->prev->next = elem->next;
-    }
+    if(elem->prev || elem->next) {
+        if(elem->prev) {
+            elem->prev->next = elem->next;
+        }
 
-    if(elem->next) {
-        elem->next->prev = elem->prev;
+        if(elem->next) {
+            elem->next->prev = elem->prev;
+        }
+    } else {
+        _mimas->window_list = NULL;
     }
 
     free(elem);
