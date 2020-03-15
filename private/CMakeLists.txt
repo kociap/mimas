@@ -22,6 +22,7 @@ if(WIN32)
         "${CMAKE_CURRENT_SOURCE_DIR}/win/gl.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/input.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/platform.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/win/time.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/vk.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/wgl.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/wgl.h"

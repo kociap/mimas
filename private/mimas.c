@@ -235,3 +235,15 @@ void mimas_destroy_cursor(Mimas_Cursor* cursor) {
 void mimas_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor) {
     mimas_platform_set_cursor(window, cursor);
 }
+
+Mimas_System_Time mimas_get_utc_system_time(void) {
+    return mimas_platform_get_utc_system_time();
+}
+
+Mimas_System_Time mimas_get_local_system_time(void) {
+    return mimas_platform_get_local_system_time();
+}
+
+double mimas_get_time(void) {
+    return mimas_platform_get_time();
+}

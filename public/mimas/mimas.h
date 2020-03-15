@@ -328,6 +328,32 @@ MIMAS_API void mimas_destroy_cursor(Mimas_Cursor* cursor);
 //
 MIMAS_API void mimas_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor);
 
+// Time 
+
+typedef struct Mimas_System_Time {
+    mimas_u16 year;
+    // 1 through 12
+    mimas_u16 month;
+    // 1 through 31
+    mimas_u16 day;
+    // 0 (Sunday) through 6 (Saturday)
+    mimas_u16 day_of_week;
+    // 0 through 23
+    mimas_u16 hour;
+    // 0 through 59
+    mimas_u16 minutes;
+    // 0 through 59
+    mimas_u16 seconds;
+    // 0 through 999
+    mimas_u16 milliseconds;
+} Mimas_System_Time;
+
+MIMAS_API Mimas_System_Time mimas_get_utc_system_time(void);
+MIMAS_API Mimas_System_Time mimas_get_local_system_time(void);
+
+// Returns time in seconds
+MIMAS_API double mimas_get_time(void);
+
 MIMAS_EXTERN_C_END
 
 #endif // !MIMAS_MIMAS_H_INCLUDE

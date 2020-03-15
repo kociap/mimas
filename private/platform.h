@@ -39,5 +39,8 @@ Mimas_Cursor* mimas_platform_create_standard_cursor(Mimas_Standard_Cursor cursor
 void mimas_platform_destroy_cursor(Mimas_Cursor* cursor);
 void mimas_platform_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor);
 
+Mimas_System_Time mimas_platform_get_utc_system_time(void);
+Mimas_System_Time mimas_platform_get_local_system_time(void);
+double mimas_platform_get_time(void);
 
 #endif // !MIMAS_MIMAS_PLATFORM_H_INCLUDE
