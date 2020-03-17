@@ -10,12 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 
-void mimas_terminate(void) {
-    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    mimas_platform_terminate(_mimas->backend);
-    _mimas_terminate_internal();
-}
-
 mimas_bool mimas_platform_init(Mimas_Backend backend) {
     if (!mimas_load_x11()) {
         return mimas_false;
@@ -25,12 +19,21 @@ mimas_bool mimas_platform_init(Mimas_Backend backend) {
     _mimas->backend = backend;
 
     if (_mimas->backend == MIMAS_BACKEND_GL) {
-        //!TODO
+        // TODO
     } else {
         mimas_platform_init_vk_backend();
     }
 
     return mimas_true;
+}
+
+void mimas_platform_terminate(Mimas_Backend backend) {
+    if(backend == MIMAS_BACKEND_GL) {
+        // TODO
+        // mimas_platform_terminate_gl_backend();
+    } else {
+        mimas_platform_terminate_vk_backend();
+    }
 }
 
 Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info info) {
