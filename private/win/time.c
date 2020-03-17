@@ -29,14 +29,28 @@ double mimas_platform_get_time(void) {
     return static_cast<double>(get_performance_counter()) / static_cast<double>(get_performance_frequency());
 }
 
-System_Time mimas_platform_get_utc_system_time(void) {
+Mimas_System_Time mimas_platform_get_utc_system_time(void) {
     SYSTEMTIME t = {};
     GetSystemTime(&t);
-    return {t.wYear, t.wMonth, t.wDay, t.wDayOfWeek, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds};
+    return (Mimas_System_Time){ .year = t.wYear, 
+                                .month = t.wMonth, 
+                                .day = t.wDay, 
+                                .day_of_week = t.wDayOfWeek, 
+                                .hour = t.wHour, 
+                                .minutes = t.wMinute, 
+                                .seconds = t.wSecond, 
+                                .milliseconds = t.wMilliseconds };
 }
 
-System_Time mimas_platform_get_local_system_time(void) {
+Mimas_System_Time mimas_platform_get_local_system_time(void) {
     SYSTEMTIME t = {};
     GetLocalTime(&t);
-    return {t.wYear, t.wMonth, t.wDay, t.wDayOfWeek, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds};
+    return (Mimas_System_Time){ .year = t.wYear, 
+                                .month = t.wMonth, 
+                                .day = t.wDay, 
+                                .day_of_week = t.wDayOfWeek, 
+                                .hour = t.wHour, 
+                                .minutes = t.wMinute, 
+                                .seconds = t.wSecond, 
+                                .milliseconds = t.wMilliseconds };
 }

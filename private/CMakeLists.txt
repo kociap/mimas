@@ -35,6 +35,7 @@ if(WIN32)
 else()
     target_sources(mimas
         PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/linux/time.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/linux/x11/platform.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/linux/x11/vk.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/linux/x11/window.c"
