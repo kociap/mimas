@@ -134,6 +134,15 @@ Mimas_Callback mimas_get_window_mouse_button_callback(Mimas_Window* window) {
     return (Mimas_Callback){(void*)window->callbacks.mouse_button, window->callbacks.mouse_button_data};
 }
 
+MIMAS_API void mimas_set_window_scroll_callback(Mimas_Window* window, mimas_window_scroll_callback callback, void* user_data) {
+    window->callbacks.scroll = callback;
+    window->callbacks.scroll_data = user_data;
+}
+
+MIMAS_API Mimas_Callback mimas_get_window_scroll_callback(Mimas_Window* window) {
+    return (Mimas_Callback){(void*)window->callbacks.scroll, window->callbacks.scroll_data};
+}
+
 void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data) {
     window->callbacks.key = callback;
     window->callbacks.key_data = user_data;

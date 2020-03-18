@@ -48,6 +48,8 @@ typedef enum Mimas_Key {
     MIMAS_MOUSE_MIDDLE_BUTTON,
     MIMAS_MOUSE_THUMB_BUTTON_1,
     MIMAS_MOUSE_THUMB_BUTTON_2,
+    MIMAS_MOUSE_WHEEL,
+    MIMAS_MOUSE_HORIZ_WHEEL,
 
     MIMAS_KEY_0 = 48,
     MIMAS_KEY_1 = 49,
@@ -260,6 +262,10 @@ MIMAS_API Mimas_Callback mimas_get_cursor_pos_callback(Mimas_Window* window);
 typedef void(*mimas_window_mouse_button_callback)(Mimas_Window* window, Mimas_Key button, Mimas_Mouse_Button_Action action, void* user_data);
 MIMAS_API void mimas_set_window_mouse_button_callback(Mimas_Window* window, mimas_window_mouse_button_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_mouse_button_callback(Mimas_Window* window);
+
+typedef void(*mimas_window_scroll_callback)(Mimas_Window* window, mimas_i32 d_x, mimas_i32 d_y, void* user_data);
+MIMAS_API void mimas_set_window_scroll_callback(Mimas_Window* window, mimas_window_scroll_callback callback, void* user_data);
+MIMAS_API Mimas_Callback mimas_get_window_scroll_callback(Mimas_Window* window);
 
 typedef void (*mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, Mimas_Key_Action action, void* user_data);
 MIMAS_API void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data);

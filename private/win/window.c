@@ -280,6 +280,24 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                         platform->key_state[MIMAS_MOUSE_THUMB_BUTTON_2] = MIMAS_KEY_RELEASE;
                     }
 
+                    if(mouse->usButtonFlags & RI_MOUSE_WHEEL) {
+                        platform->key_state[MIMAS_MOUSE_WHEEL] = mouse->usButtonData;
+                        if(window->callbacks.scroll) {
+                            window->callbacks.scroll(window, 0, mouse->usButtonData, window->callbacks.scroll_data);
+                        }
+                        // Reset because there's no event for 0 delta.
+                        platform->key_state[MIMAS_MOUSE_WHEEL] = 0;
+                    }
+
+                    if(mouse->usButtonFlags & RI_MOUSE_HWHEEL) {
+                        platform->key_state[MIMAS_MOUSE_HORIZ_WHEEL] = mouse->usButtonData;
+                        if(window->callbacks.scroll) {
+                            window->callbacks.scroll(window, mouse->usButtonData, 0, window->callbacks.scroll_data);
+                        }
+                        // Reset because there's no event for 0 delta.
+                        platform->key_state[MIMAS_MOUSE_HORIZ_WHEEL] = 0;
+                    }
+
                     // mimas_bool const mouse_move_absolute = !!(mouse->usFlags & MOUSE_MOVE_ABSOLUTE);
                     mimas_bool const mouse_move_relative = !(mouse->usFlags & MOUSE_MOVE_ABSOLUTE);
                     if(mouse_move_relative && _mimas->virtual_cursor_window) {
@@ -291,6 +309,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                         }
                     } 
                     // TODO: absolute mouse move
+                    // TODO: virtual desktop
                 } break;
 
                 case RIM_TYPEHID: {
