@@ -282,8 +282,8 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
                     if(mouse->usButtonFlags & RI_MOUSE_WHEEL) {
                         platform->key_state[MIMAS_MOUSE_WHEEL] = mouse->usButtonData;
-                        if(window->callbacks.scroll) {
-                            window->callbacks.scroll(window, 0, mouse->usButtonData, window->callbacks.scroll_data);
+                        if(_mimas->active_window && _mimas->active_window->callbacks.scroll) {
+                            _mimas->active_window->callbacks.scroll(_mimas->active_window, 0, mouse->usButtonData, _mimas->active_window->callbacks.scroll_data);
                         }
                         // Reset because there's no event for 0 delta.
                         platform->key_state[MIMAS_MOUSE_WHEEL] = 0;
@@ -291,8 +291,8 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
                     if(mouse->usButtonFlags & RI_MOUSE_HWHEEL) {
                         platform->key_state[MIMAS_MOUSE_HORIZ_WHEEL] = mouse->usButtonData;
-                        if(window->callbacks.scroll) {
-                            window->callbacks.scroll(window, mouse->usButtonData, 0, window->callbacks.scroll_data);
+                        if(_mimas->active_window && _mimas->active_window->callbacks.scroll) {
+                            _mimas->active_window->callbacks.scroll(_mimas->active_window, mouse->usButtonData, 0, _mimas->active_window->callbacks.scroll_data);
                         }
                         // Reset because there's no event for 0 delta.
                         platform->key_state[MIMAS_MOUSE_HORIZ_WHEEL] = 0;
@@ -318,7 +318,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
             }
         }
 
-        return DefWindowProc(hwnd, msg, wparam, lparam);
+        return DefWindowProcW(hwnd, msg, wparam, lparam);
     } else {
         {
             mimas_bool mouse_button_down = msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN || msg == WM_MBUTTONDOWN || msg == WM_XBUTTONDOWN;
@@ -503,7 +503,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
             } break;
         }
 
-        return DefWindowProc(hwnd, msg, wparam, lparam);
+        return DefWindowProcW(hwnd, msg, wparam, lparam);
     }
 }
 
