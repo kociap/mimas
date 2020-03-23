@@ -571,6 +571,7 @@ static Mimas_Window* create_native_window(Mimas_Window_Create_Info const info) {
     }
 
     Mimas_Win_Window* native_window = (Mimas_Win_Window*)malloc(sizeof(Mimas_Win_Window));
+    memset(native_window, 0, sizeof(Mimas_Win_Window));
     native_window->handle = hwnd;
     native_window->hdc = hdc;
     window->native_window = native_window;
