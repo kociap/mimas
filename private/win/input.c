@@ -2,6 +2,42 @@
 #include <win/platform.h>
 #include <mimas/mimas.h>
 
+#include <internal.h>
+
+#include <hidusage.h>
+#include <windows.h>
+
+void _mimas_install_input_listener() {
+    Mimas_Internal* _mimas = _mimas_get_mimas_internal();   
+    Mimas_Win_Platform* platform  = (Mimas_Win_Platform*)_mimas->platform;
+    Mimas_Win_Window* dummy_window = (Mimas_Win_Window*)platform->dummy_window->native_window;
+    HWND dummy_hwnd = dummy_window->handle;
+
+    RAWINPUTDEVICE rid[] = {
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_JOYSTICK, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
+    };
+    RegisterRawInputDevices(rid, 4, sizeof(RAWINPUTDEVICE));
+}
+
+void _mimas_uninstall_input_listener() {
+    Mimas_Internal* _mimas = _mimas_get_mimas_internal();   
+    Mimas_Win_Platform* platform  = (Mimas_Win_Platform*)_mimas->platform;
+    Mimas_Win_Window* dummy_window = (Mimas_Win_Window*)platform->dummy_window->native_window;
+    HWND dummy_hwnd = dummy_window->handle;
+
+    RAWINPUTDEVICE rid_old[] = {
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_REMOVE, .hwndTarget = NULL},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = RIDEV_REMOVE, .hwndTarget = NULL},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_JOYSTICK, .dwFlags = RIDEV_REMOVE, .hwndTarget = NULL},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_REMOVE, .hwndTarget = NULL}
+    };
+    
+    RegisterRawInputDevices(rid_old, 4, sizeof(RAWINPUTDEVICE));
+}
+
 void mimas_platform_set_cursor_pos(mimas_i32 const x, mimas_i32 const y) {
     SetCursorPos(x, y);
 }
