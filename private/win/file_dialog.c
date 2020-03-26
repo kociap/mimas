@@ -6,15 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <windows.h>
-
 
 #include <shlobj_core.h>
 #include <shlwapi.h>
 #include <shobjidl.h>
 #include <combaseapi.h>
 
-#include <stdio.h>
 
 static IShellItem* create_shell_item_from_path(char const* path) {
     if (!path) { return NULL;  }
@@ -32,12 +29,13 @@ static IShellItem* create_shell_item_from_path(char const* path) {
 }
 
 // New implementation using the COM api
-char* mimas_platform_open_file_dialog(Mimas_File_Dialog_Flags user_flags, Mimas_File_Filter* filters, mimas_u64 filter_count, char const* default_path) {
+char* mimas_platform_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dialog_Flags user_flags, 
+                                      Mimas_File_Filter* filters, mimas_u64 filter_count, char const* default_path) {
     IFileDialog* dialog = NULL;
     // Create the file dialog instance. Note that the documentation says to pass the GUID's by reference, but the C API needs pointers.
     CLSID const* cls_id = NULL;
-    if (user_flags & MIMAS_FILE_DIALOG_OPEN) { cls_id = &CLSID_FileOpenDialog; }
-    else if (user_flags & MIMAS_FILE_DIALOG_SAVE) { cls_id = &CLSID_FileSaveDialog; }
+    if (type == MIMAS_FILE_DIALOG_OPEN) { cls_id = &CLSID_FileOpenDialog; }
+    else if (type == MIMAS_FILE_DIALOG_SAVE) { cls_id = &CLSID_FileSaveDialog; }
     // User must specify either MIMAS_FILE_DIALOG_OPEN or MIMAS_FILE_DIALOG_SAVE for this function to work.
     else { return NULL;  }
     HRESULT hr = CoCreateInstance(cls_id, NULL, CLSCTX_INPROC_SERVER, &IID_IFileDialog, (void**)&dialog);
