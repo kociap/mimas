@@ -337,14 +337,14 @@ MIMAS_API void mimas_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor);
 // File dialog
 
 typedef enum Mimas_File_Dialog_Flags {
-    // Allows the file dialog to pick files
-    MIMAS_FILE_DIALOG_PICK_FILES = 1,
-    // Allows the file dialog to pick folders
-    MIMAS_FILE_DIALOG_PICK_FOLDERS = 2,
     // Opens an "open file" dialog. You must specify either this or MIMAS_FILE_DIALOG_SAVE, or mimas_open_file_dialog will return NULL
-    MIMAS_FILE_DIALOG_OPEN = 4,
+    MIMAS_FILE_DIALOG_OPEN = 0,
     // Opens a "save file" dialog. You must specify either this or MIMAS_FILE_DIALOG_OPEN, or mimas_open_file_dialog will return NULL
-    MIMAS_FILE_DIALOG_SAVE = 8
+    MIMAS_FILE_DIALOG_SAVE = 1,
+    // Allows the file dialog to pick files
+    MIMAS_FILE_DIALOG_PICK_FILES = 2,
+    // Allows the file dialog to pick folders
+    MIMAS_FILE_DIALOG_PICK_FOLDERS = 4
 } Mimas_File_Dialog_Flags;
 
 typedef struct Mimas_File_Filter {
