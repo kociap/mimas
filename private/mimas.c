@@ -245,6 +245,10 @@ void mimas_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor) {
     mimas_platform_set_cursor(window, cursor);
 }
 
+char* mimas_open_file_dialog(Mimas_File_Dialog_Flags flags, Mimas_File_Filter* filters, mimas_u64 filter_count, char const* default_path) {
+    return mimas_platform_open_file_dialog(flags, filters, filter_count, default_path);
+}
+
 Mimas_System_Time mimas_get_utc_system_time(void) {
     return mimas_platform_get_utc_system_time();
 }

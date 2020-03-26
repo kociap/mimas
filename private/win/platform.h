@@ -34,5 +34,7 @@ typedef struct Mimas_Win_Platform {
 
 Mimas_Display** _mimas_get_connected_displays(mimas_i64* const count);
 void _mimas_free_displays(Mimas_Display** displays, mimas_i64 const count);
+void _mimas_install_input_listener();
+void _mimas_uninstall_input_listener();
 
 #endif // !MIMAS_WIN_PLATFORM_H_INCLUDE

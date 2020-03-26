@@ -18,6 +18,7 @@ if(WIN32)
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/win/cursor.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/display.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/win/file_dialog.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/gl.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/input.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/platform.h"
@@ -27,7 +28,7 @@ if(WIN32)
         "${CMAKE_CURRENT_SOURCE_DIR}/win/wgl.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/win/window.c"
     )
-    target_link_libraries(mimas PRIVATE dwmapi gdi32)
+    target_link_libraries(mimas PRIVATE dwmapi gdi32 comdlg32 propsys shlwapi)
 
     if(BUILD_SHARED_LIBS)
         target_compile_definitions(mimas PRIVATE MIMAS_BUILDING_DLL=1)

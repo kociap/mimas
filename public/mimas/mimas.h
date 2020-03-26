@@ -334,6 +334,32 @@ MIMAS_API void mimas_destroy_cursor(Mimas_Cursor* cursor);
 //
 MIMAS_API void mimas_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor);
 
+// File dialog
+
+typedef enum Mimas_File_Dialog_Flags {
+    // Allows the file dialog to pick files
+    MIMAS_FILE_DIALOG_PICK_FILES = 1,
+    // Allows the file dialog to pick folders
+    MIMAS_FILE_DIALOG_PICK_FOLDERS = 2,
+    // Opens an "open file" dialog. You must specify either this or MIMAS_FILE_DIALOG_SAVE, or mimas_open_file_dialog will return NULL
+    MIMAS_FILE_DIALOG_OPEN = 4,
+    // Opens a "save file" dialog. You must specify either this or MIMAS_FILE_DIALOG_OPEN, or mimas_open_file_dialog will return NULL
+    MIMAS_FILE_DIALOG_SAVE = 8
+} Mimas_File_Dialog_Flags;
+
+typedef struct Mimas_File_Filter {
+    // Display name of the filter
+    char const* name;
+    // The actual filter string. An example of a filter string accepting only png files is "*.png"
+    // To filter for multiple types in the same filter string you can separate filters by a semicolon: "*.png;*.jpg"
+    char const* filter;
+} Mimas_File_Filter;
+
+// Opens a native file dialog. For an explanation on the different flags and filters, see comments for Mimas_File_Dialog_Flags and 
+// Mimas_File_Filter. If the file selection is canceled or no file was selected, this function returns NULL. Otherwise it returns a
+// pointer to a character array that has to be freed by the user, or NULL if the function failed for any other reason
+MIMAS_API char* mimas_open_file_dialog(Mimas_File_Dialog_Flags flags, Mimas_File_Filter* filters, mimas_u64 filter_count, char const* default_path);
+
 // Time 
 
 typedef struct Mimas_System_Time {
