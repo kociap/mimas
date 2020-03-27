@@ -345,9 +345,9 @@ typedef enum Mimas_File_Dialog_Flags {
 
 typedef enum Mimas_File_Dialog_Type {
     // Opens an "open file" dialog. You must specify either this or MIMAS_FILE_DIALOG_SAVE, or mimas_open_file_dialog will return NULL
-    MIMAS_FILE_DIALOG_OPEN = 1,
+    MIMAS_FILE_DIALOG_OPEN = 0,
     // Opens a "save file" dialog. You must specify either this or MIMAS_FILE_DIALOG_OPEN, or mimas_open_file_dialog will return NULL
-    MIMAS_FILE_DIALOG_SAVE = 2,
+    MIMAS_FILE_DIALOG_SAVE = 1,
 } Mimas_File_Dialog_Type;
 
 typedef struct Mimas_File_Filter {
