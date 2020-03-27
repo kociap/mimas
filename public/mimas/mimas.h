@@ -340,7 +340,7 @@ typedef enum Mimas_File_Dialog_Flags {
     // Allows the file dialog to pick files
     MIMAS_FILE_DIALOG_PICK_FILES = 0,
     // Allows the file dialog to pick folders
-    MIMAS_FILE_DIALOG_PICK_FOLDER = 1
+    MIMAS_FILE_DIALOG_PICK_FOLDERS = 1
 } Mimas_File_Dialog_Flags;
 
 typedef enum Mimas_File_Dialog_Type {
