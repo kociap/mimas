@@ -82,6 +82,9 @@ void mimas_destroy_window(Mimas_Window* window) {
     if(elem->prev || elem->next) {
         if(elem->prev) {
             elem->prev->next = elem->next;
+        } else {
+            // elem is first in the list. We have to reassign the head of the list
+            _mimas->window_list = elem->next;
         }
 
         if(elem->next) {
