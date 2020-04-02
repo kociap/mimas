@@ -490,7 +490,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
             } break;
 
             case WM_MOUSEMOVE: {
-                if(_mimas->locked_cursor_window && window->callbacks.cursor_pos) {
+                if(!_mimas->locked_cursor_window && window->callbacks.cursor_pos) {
                     window->callbacks.cursor_pos(window, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), window->callbacks.cursor_pos_data);
                 }
 
