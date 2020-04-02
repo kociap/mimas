@@ -17,7 +17,8 @@ typedef struct Mimas_Window_List_Element {
 typedef struct Mimas_Internal {
     Mimas_Window* active_window;
     Mimas_Window* clipped_cursor_window;
-    Mimas_Window* virtual_cursor_window;
+    // Is non-NULL when a window that locks the cursor is active.
+    Mimas_Window* locked_cursor_window;
     Mimas_Window_List_Element* window_list;
     Mimas_Display** displays;
     mimas_i64 display_count;
