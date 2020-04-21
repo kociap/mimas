@@ -18,11 +18,14 @@
 typedef struct Mimas_Win_Window {
     HWND handle;
     HDC hdc;
+    // Used by the event loop to determine whether the window was activated
+    // by an action in the client area for cursor clipping/locking. 
     mimas_bool non_client_activate;
 } Mimas_Win_Window;
 
 typedef struct Mimas_Win_Display {
     HMONITOR hmonitor;
+    // 64 because the names might be at most 32 wchars (enforced by winapi).
     char display_name[64];
     char adapter_name[64];
 } Mimas_Win_Display;

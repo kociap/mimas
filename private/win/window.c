@@ -747,6 +747,15 @@ void mimas_platform_destroy_window(Mimas_Window* const window) {
     destroy_native_window(window);
 }
 
+void mimas_platform_set_window_title(Mimas_Window* const window, char const* title) {
+    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+    int const wtitle_buffer_size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, title, -1, NULL, 0);
+    wchar_t* const wtitle = malloc(sizeof(wchar_t) * wtitle_buffer_size);
+    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, title, -1, wtitle, wtitle_buffer_size);
+    SetWindowTextW(native_window->handle, wtitle);
+    free(wtitle);
+}
+
 void mimas_platform_set_window_pos(Mimas_Window* const window, mimas_i32 const x, mimas_i32 const y) {
     if(!window->display) {
         Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;

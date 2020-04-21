@@ -218,11 +218,13 @@ MIMAS_API Mimas_Display** mimas_get_displays(mimas_i64* count);
 MIMAS_API Mimas_Display_Settings mimas_get_display_settings(Mimas_Display* display);
 
 // Makes a window non-exclusive fullscreen on given display.
+//
 // If display is NULL, the window will be restored to normal mode. The window will not be restored to the previous size.
-//   If you want to restore the window to its previous size, store its size before you fullscreen the window. 
-//   After you restore the window to normal state, call mimas_set_window_content_size with the saved values.
+// If you want to restore the window to its previous size, store its size before you fullscreen the window. 
+// After you restore the window to normal state, call mimas_set_window_content_size with the saved values.
+//
 // The window will always be shown after this function finishes, but will not be active. 
-//   If you want to hide the widnow, see mimas_hide_window.
+// If you want to hide the widnow, see mimas_hide_window.
 //
 MIMAS_API void mimas_fullscreen_window(Mimas_Window* window, Mimas_Display* display);
 
@@ -233,9 +235,15 @@ typedef struct Mimas_Window_Create_Info {
     mimas_bool decorated;
 } Mimas_Window_Create_Info;
 
-MIMAS_API Mimas_Window* mimas_create_window(Mimas_Window_Create_Info);
+MIMAS_API Mimas_Window* mimas_create_window(Mimas_Window_Create_Info info);
 MIMAS_API void mimas_destroy_window(Mimas_Window* window);
 MIMAS_API mimas_bool mimas_close_requested(Mimas_Window* window);
+
+// Sets the title of a window.
+// 
+// title - pointer to null-terminated UTF-8 encoded string.
+//
+MIMAS_API void mimas_set_window_title(Mimas_Window* window, char const* title);
 
 typedef struct Mimas_Callback {
     void* callback;

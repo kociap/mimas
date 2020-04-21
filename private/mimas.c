@@ -101,6 +101,10 @@ mimas_bool mimas_close_requested(Mimas_Window* window) {
     return window->close_requested;
 }
 
+void mimas_set_window_title(Mimas_Window* window, char const* title) {
+    mimas_platform_set_window_title(window, title);
+}
+
 void mimas_set_window_activate_callback(Mimas_Window* window, mimas_window_activate_callback callback, void* user_data) {
     window->callbacks.window_activate = callback;
     window->callbacks.window_activate_data = user_data;

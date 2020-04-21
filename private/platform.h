@@ -14,6 +14,7 @@ void mimas_platform_fullscreen_window(Mimas_Window* window, Mimas_Display* displ
 
 Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info);
 void mimas_platform_destroy_window(Mimas_Window* window);
+void mimas_platform_set_window_title(Mimas_Window* window, char const* title);
 
 void mimas_platform_set_window_pos(Mimas_Window* window, mimas_i32 x, mimas_i32 y);
 void mimas_platform_get_window_pos(Mimas_Window* window, mimas_i32* x, mimas_i32* y);
