@@ -34,13 +34,21 @@ char* mimas_platform_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Di
     IFileDialog* dialog = NULL;
     // Create the file dialog instance. Note that the documentation says to pass the GUID's by reference, but the C API needs pointers.
     CLSID const* cls_id = NULL;
-    if (type == MIMAS_FILE_DIALOG_OPEN) { cls_id = &CLSID_FileOpenDialog; }
-    else if (type == MIMAS_FILE_DIALOG_SAVE) { cls_id = &CLSID_FileSaveDialog; }
-    // User must specify either MIMAS_FILE_DIALOG_OPEN or MIMAS_FILE_DIALOG_SAVE for this function to work.
-    else { return NULL;  }
-    HRESULT hr = CoCreateInstance(cls_id, NULL, CLSCTX_INPROC_SERVER, &IID_IFileDialog, (void**)&dialog);
+    if (type == MIMAS_FILE_DIALOG_OPEN) {
+        cls_id = &CLSID_FileOpenDialog;
+    } else if (type == MIMAS_FILE_DIALOG_SAVE) {
+        cls_id = &CLSID_FileSaveDialog;
+    } else { 
+        // User must specify either MIMAS_FILE_DIALOG_OPEN or MIMAS_FILE_DIALOG_SAVE for this function to work.
+        return NULL;  
+    }
 
-    if (!dialog) { return NULL; }
+    HRESULT hr = CoCreateInstance(cls_id, NULL, CLSCTX_INPROC_SERVER, &IID_IFileDialog, (void**)&dialog);
+    UNUSED(hr);
+
+    if (!dialog) {
+        return NULL;
+    }
     
     // Set options for the file dialog
     DWORD flags;

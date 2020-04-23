@@ -26,7 +26,6 @@ void _mimas_uninstall_input_listener() {
     Mimas_Internal* _mimas = _mimas_get_mimas_internal();   
     Mimas_Win_Platform* platform  = (Mimas_Win_Platform*)_mimas->platform;
     Mimas_Win_Window* dummy_window = (Mimas_Win_Window*)platform->dummy_window->native_window;
-    HWND dummy_hwnd = dummy_window->handle;
 
     RAWINPUTDEVICE rid_old[] = {
         {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_REMOVE, .hwndTarget = NULL},
