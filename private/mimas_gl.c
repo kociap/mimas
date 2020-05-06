@@ -4,6 +4,10 @@
 #include <platform.h>
 
 mimas_bool mimas_init_with_gl(void) {
+    if(_mimas_is_initialized()) {
+        return mimas_true;
+    }
+
     _mimas_init_internal(MIMAS_BACKEND_GL);
     mimas_bool const res = mimas_platform_init(MIMAS_BACKEND_GL);
     if(!res) {
