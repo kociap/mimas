@@ -159,6 +159,15 @@ Mimas_Callback mimas_get_window_key_callback(Mimas_Window* window) {
     return (Mimas_Callback){(void*)window->callbacks.key, window->callbacks.key_data};
 }
 
+void mimas_set_window_char_callback(Mimas_Window* window, mimas_window_char_callback callback, void* user_data) {
+    window->callbacks.character = callback;
+    window->callbacks.character_data = user_data;
+}
+
+Mimas_Callback mimas_get_window_char_callback(Mimas_Window* window) {
+    return (Mimas_Callback){(void*)window->callbacks.character, window->callbacks.character_data};
+}
+
 void mimas_set_window_hittest(Mimas_Window* window, mimas_window_hittest callback) {
     window->callbacks.hittest = callback;
 }

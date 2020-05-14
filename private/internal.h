@@ -64,6 +64,8 @@ struct Mimas_Window {
         void* scroll_data;
         mimas_window_key_callback key;
         void* key_data;
+        mimas_window_char_callback character;
+        void* character_data;
         mimas_window_close_requested close_requested;
         void* close_requested_data;
         mimas_window_hittest hittest;

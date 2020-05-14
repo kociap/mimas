@@ -21,6 +21,9 @@ typedef struct Mimas_Win_Window {
     // Used by the event loop to determine whether the window was activated
     // by an action in the client area for cursor clipping/locking. 
     mimas_bool non_client_activate;
+    // Used by WM_CHAR for translating 2 consecutive WM_CHAR messages into a single codepoint.
+    mimas_char32 cooked_character;
+    mimas_bool cooking_character;
 } Mimas_Win_Window;
 
 typedef struct Mimas_Win_Display {

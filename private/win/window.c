@@ -497,6 +497,37 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                 return 0;
             } break;
 
+            case WM_CHAR: {
+                Mimas_Win_Window* native_window = (Mimas_Win_Window*)window->native_window;
+                mimas_char32 const surrogate = wparam;
+                if(native_window->cooking_character) {
+                    native_window->cooking_character = mimas_false;
+                    mimas_char32 const high_surrogate = native_window->cooked_character;
+                    // Subtract 0xD800 from high surrogate. Subtract 0xDC00 from low surrogate.
+                    // Subtract 0x10000 from the merged surrogates.
+                    // 0x35FDC00 = (0xD800 << 10) + 0xDC00 - 0x10000
+                    mimas_char32 const cooked_char = (((high_surrogate & 0x3FF) << 10) | (surrogate & 0x3FF)) - 0x35FDC00;
+                    native_window->cooked_character = cooked_char;
+                } else {
+                    // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars.
+                    if(surrogate <= 0xD7FF || surrogate >= 0xE000) {
+                        native_window->cooked_character = surrogate;
+                    } else {
+                        native_window->cooking_character = mimas_true;
+                        native_window->cooked_character = surrogate;
+                        return 0;
+                    }
+                }
+
+                if(window->callbacks.character) {
+                    mimas_char32 const cooked_char = native_window->cooked_character;
+                    native_window->cooking_character = mimas_false;
+                    window->callbacks.character(window, cooked_char, window->callbacks.character_data);
+                }
+
+                return 0;
+            } break;
+
             case WM_CLOSE: {
                 window->close_requested = mimas_true;
                 return 0;

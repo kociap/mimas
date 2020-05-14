@@ -39,6 +39,9 @@ typedef int mimas_i32;
 typedef unsigned int mimas_u32;
 typedef long long mimas_i64;
 typedef unsigned long long mimas_u64;
+typedef mimas_u8 mimas_char8;
+typedef mimas_u16 mimas_char16;
+typedef mimas_u32 mimas_char32;
 
 typedef enum Mimas_Key {
     MIMAS_KEY_UNKNOWN = -1,
@@ -278,6 +281,10 @@ MIMAS_API Mimas_Callback mimas_get_window_scroll_callback(Mimas_Window* window);
 typedef void (*mimas_window_key_callback)(Mimas_Window* window, Mimas_Key key, Mimas_Key_Action action, void* user_data);
 MIMAS_API void mimas_set_window_key_callback(Mimas_Window* window, mimas_window_key_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_key_callback(Mimas_Window* window);
+
+typedef void (*mimas_window_char_callback)(Mimas_Window* window, mimas_char32 codepoint, void* user_data);
+MIMAS_API void mimas_set_window_char_callback(Mimas_Window* window, mimas_window_char_callback callback, void* user_data);
+MIMAS_API Mimas_Callback mimas_get_window_char_callback(Mimas_Window* window);
 
 typedef void(*mimas_window_close_requested)(Mimas_Window* window, void* user_data);
 MIMAS_API void mimas_set_window_close_requested_callback(Mimas_Window* window, void* user_data);
