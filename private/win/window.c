@@ -242,8 +242,10 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                     Mimas_Key const key = translate_scan_code(kb->MakeCode, e0, e1);
                     if(key != MIMAS_KEY_UNKNOWN) {
                         platform->key_state[key] = action;
-                        if(_mimas->active_window && _mimas->active_window->callbacks.key) {
-                            _mimas->active_window->callbacks.key(_mimas->active_window, key, action, _mimas->active_window->callbacks.key_data);
+                        Mimas_Window* const active_window = _mimas->active_window;
+                        if(active_window && active_window->callbacks.key) {
+                            active_window->keys[key] = action;
+                            active_window->callbacks.key(active_window, key, action, active_window->callbacks.key_data);
                         }
                     }
                 } break;
