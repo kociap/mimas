@@ -394,6 +394,16 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                         _mimas->clipped_cursor_window = NULL;
                         ClipCursor(NULL);
                     }
+
+                    // If input sink is disabled and the application is losing focus (lparam is NULL, which means 
+                    // none of our windows are being activated), we also want to clear all the global keys to make sure that 
+                    // none of the keys will be reported as pressed when the release happens after focus loss.
+                    Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas->platform;
+                    if(lparam == NULL && platform->disable_raw_input_sink) {
+                        for(mimas_u32 i = 0; i < ARRAY_SIZE(platform->key_state); ++i) {
+                            platform->key_state[i] = MIMAS_KEY_RELEASE;
+                        }
+                    }
                 }
             } break;
 
@@ -630,7 +640,7 @@ static void destroy_native_window(Mimas_Window* const window) {
     free(window);
 }
 
-mimas_bool mimas_platform_init(Mimas_Backend const backend) {
+mimas_bool mimas_platform_init(Mimas_Backend const backend, Mimas_Init_Options const* const options) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     _mimas->displays = _mimas_get_connected_displays(&_mimas->display_count);
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)malloc(sizeof(Mimas_Win_Platform));
@@ -640,6 +650,8 @@ mimas_bool mimas_platform_init(Mimas_Backend const backend) {
     }
     memset(platform, 0, sizeof(Mimas_Win_Platform));
     _mimas->platform = platform;
+
+    platform->disable_raw_input_sink = options->capture_input_when_application_is_out_of_focus;
 
     mimas_bool const register_res = register_window_class();
     if(!register_res) {
@@ -689,15 +701,7 @@ mimas_bool mimas_platform_init(Mimas_Backend const backend) {
     }
 
     _mimas->default_cursor = mimas_platform_create_standard_cursor(MIMAS_CURSOR_ARROW);
-
-    // Install global raw input listener 
-    RAWINPUTDEVICE rid[] = {
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_JOYSTICK, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
-    };
-    RegisterRawInputDevices(rid, ARRAY_SIZE(rid), sizeof(RAWINPUTDEVICE));
+    _mimas_install_input_listener();
 
     return mimas_true;
 }
@@ -712,14 +716,7 @@ void mimas_platform_terminate(Mimas_Backend const backend) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas->platform;
     HWND const dummy_hwnd = ((Mimas_Win_Window*)platform->dummy_window->native_window)->handle;
-    // Remove global raw input listener 
-    RAWINPUTDEVICE rid[] = {
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_REMOVE, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = RIDEV_REMOVE, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_JOYSTICK, .dwFlags = RIDEV_REMOVE, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_REMOVE, .hwndTarget = dummy_hwnd}
-    };
-    RegisterRawInputDevices(rid, 4, sizeof(RAWINPUTDEVICE));
+    _mimas_uninstall_input_listener();
     mimas_platform_destroy_cursor(_mimas->default_cursor);
     destroy_native_window(platform->dummy_window);
     unregister_window_class();

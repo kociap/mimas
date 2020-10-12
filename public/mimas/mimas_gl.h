@@ -12,9 +12,11 @@ typedef enum {
     MIMAS_GL_COMPATIBILITY_PROFILE,
 } Mimas_GL_Profile;
 
+// mimas_init_with_gl
+//
 // Returns: mimas_true if successfully initialized. mimas_false otherwise.
 //
-MIMAS_API mimas_bool mimas_init_with_gl(void);
+MIMAS_API mimas_bool mimas_init_with_gl(Mimas_Init_Options const* options);
 
 MIMAS_API Mimas_GL_Context* mimas_create_gl_context(mimas_i32 version_major, mimas_i32 version_minor, Mimas_GL_Profile profile);
 MIMAS_API void mimas_destroy_gl_context(Mimas_GL_Context* ctx);

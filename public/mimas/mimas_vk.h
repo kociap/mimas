@@ -9,9 +9,11 @@ typedef struct VkInstance_T* VkInstance;
 typedef struct VkSurfaceKHR_T* VkSurfaceKHR;
 struct VkAllocationCallbacks;
 
+// mimas_init_with_vk
+//
 // Returns: mimas_true if successfully initialized. mimas_false otherwise.
 //
-MIMAS_API mimas_bool mimas_init_with_vk(void);
+MIMAS_API mimas_bool mimas_init_with_vk(Mimas_Init_Options const* options);
 
 // mimas_get_vk_extensions
 // Returns: A NULL terminated list of vk extension names.

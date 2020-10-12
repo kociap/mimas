@@ -3,13 +3,13 @@
 #include <platform_gl.h>
 #include <platform.h>
 
-mimas_bool mimas_init_with_gl(void) {
+mimas_bool mimas_init_with_gl(Mimas_Init_Options const* const options) {
     if(_mimas_is_initialized()) {
         return mimas_true;
     }
 
     _mimas_init_internal(MIMAS_BACKEND_GL);
-    mimas_bool const res = mimas_platform_init(MIMAS_BACKEND_GL);
+    mimas_bool const res = mimas_platform_init(MIMAS_BACKEND_GL, options);
     if(!res) {
         _mimas_terminate_internal();
     }

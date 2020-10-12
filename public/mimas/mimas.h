@@ -212,6 +212,10 @@ typedef struct Mimas_Display_Settings {
     mimas_i64 refresh_rate;
 } Mimas_Display_Settings;
 
+typedef struct Mimas_Init_Options {
+    mimas_bool capture_input_when_application_is_out_of_focus;
+} Mimas_Init_Options;
+
 MIMAS_API void mimas_terminate(void);
 
 MIMAS_API void mimas_poll_events(void);

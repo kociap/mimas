@@ -13,11 +13,16 @@ void _mimas_install_input_listener() {
     Mimas_Win_Window* dummy_window = (Mimas_Win_Window*)platform->dummy_window->native_window;
     HWND dummy_hwnd = dummy_window->handle;
 
+    mimas_u32 flags = 0;
+    if(!platform->disable_raw_input_sink) {
+        flags |= RIDEV_INPUTSINK;
+    }
+
     RAWINPUTDEVICE rid[] = {
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_JOYSTICK, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
-        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = RIDEV_INPUTSINK, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = flags, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = flags, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_JOYSTICK, .dwFlags = flags, .hwndTarget = dummy_hwnd},
+        {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_GAMEPAD, .dwFlags = flags, .hwndTarget = dummy_hwnd},
     };
     RegisterRawInputDevices(rid, 4, sizeof(RAWINPUTDEVICE));
 }
