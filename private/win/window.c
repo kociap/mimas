@@ -395,11 +395,11 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                         ClipCursor(NULL);
                     }
 
-                    // If input sink is disabled and the application is losing focus (lparam is NULL, which means 
+                    // If input sink is disabled and the application is losing focus (lparam is 0, which means 
                     // none of our windows are being activated), we also want to clear all the global keys to make sure that 
                     // none of the keys will be reported as pressed when the release happens after focus loss.
                     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas->platform;
-                    if(lparam == NULL && platform->disable_raw_input_sink) {
+                    if(lparam == 0 && platform->disable_raw_input_sink) {
                         for(mimas_u32 i = 0; i < ARRAY_SIZE(platform->key_state); ++i) {
                             platform->key_state[i] = MIMAS_KEY_RELEASE;
                         }

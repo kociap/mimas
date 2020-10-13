@@ -4,7 +4,7 @@
 #include <internal.h>
 #include <mimas/mimas.h>
 
-mimas_bool mimas_platform_init(Mimas_Backend backend);
+mimas_bool mimas_platform_init(Mimas_Backend backend, Mimas_Init_Options const* options);
 void mimas_platform_terminate(Mimas_Backend backend);
 
 void mimas_platform_poll_events(void);
