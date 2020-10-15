@@ -278,7 +278,11 @@ typedef void(*mimas_window_mouse_button_callback)(Mimas_Window* window, Mimas_Ke
 MIMAS_API void mimas_set_window_mouse_button_callback(Mimas_Window* window, mimas_window_mouse_button_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_mouse_button_callback(Mimas_Window* window);
 
-typedef void(*mimas_window_scroll_callback)(Mimas_Window* window, mimas_i32 d_x, mimas_i32 d_y, void* user_data);
+// mimas_window_scroll_callback
+// d_x and d_y are the delta values of the wheel where fractional values represent partial scroll actions.
+// Fractional values might be returned by e.g. mice with free-rotating wheel.
+//
+typedef void(*mimas_window_scroll_callback)(Mimas_Window* window, float d_x, float d_y, void* user_data);
 MIMAS_API void mimas_set_window_scroll_callback(Mimas_Window* window, mimas_window_scroll_callback callback, void* user_data);
 MIMAS_API Mimas_Callback mimas_get_window_scroll_callback(Mimas_Window* window);
 
