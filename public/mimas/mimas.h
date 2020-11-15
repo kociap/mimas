@@ -322,16 +322,41 @@ MIMAS_API void mimas_maximize_window(Mimas_Window* window);
 //
 MIMAS_API Mimas_Key_Action mimas_get_key(Mimas_Key key);
 
+// mimas_clip_cursor
 // Confines the cursor to an area inside window defined by region.
+// The cursor may only be clipped to a single window at a time. It must be unclipped before it may be clipped to another window.
+// Calling this function has no effect if the cursor has been locked by mimas_lock_cursor or mimas_lock_cursor_to_window.
 //
-// region is in screen coordinates relative to top-left corner of the client area of the window
-// and will be cropped so that it doesn't extend outside the window. 
-// If region is NULL, the cursor will be released.
+// Parameters:
+// region - the clip region in screen coordinates relative to the top-left corner of the client area of the window.
+//          Will be cropped so that it doesn't extend outside the client area of the window. 
+//          If region is NULL, the cursor will be released.
 //
 MIMAS_API void mimas_clip_cursor(Mimas_Window* window, Mimas_Rect const* region);
 
-MIMAS_API void mimas_lock_cursor(Mimas_Window* window);
-MIMAS_API void mimas_unlock_cursor(Mimas_Window* window);
+// mimas_lock_cursor
+// Locks the cursor in its current position preventing it from moving.
+// Calling this function has no effect when the cursor is locked or has been clipped by mimas_clip_cursor.
+// To unlock the cursor call mimas_unlock_cursor.
+//
+MIMAS_API void mimas_lock_cursor();
+
+// mimas_unlock_cursor
+//
+MIMAS_API void mimas_unlock_cursor();
+
+// mimas_lock_cursor_to_window
+// Saves the position of the cursor, centers the cursor on window and locks it preventing it from moving.
+// The cursor may only be locked to a single window at a time. It must be unlocked before it may be locked again.
+// Calling this function has no effect when the cursor is locked or has been clipped by mimas_clip_cursor.
+// To unlock the cursor call mimas_unlock_cursor_from_window.
+//
+MIMAS_API void mimas_lock_cursor_to_window(Mimas_Window* window);
+
+// mimas_unlock_cursor_from_window
+// Unlocks the cursor and restores its position to the position saved by mimas_lock_cursor_to_window.
+//
+MIMAS_API void mimas_unlock_cursor_from_window();
 
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 MIMAS_API void mimas_set_cursor_pos(mimas_i32 x, mimas_i32 y);

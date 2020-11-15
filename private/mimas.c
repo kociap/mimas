@@ -233,6 +233,22 @@ void mimas_clip_cursor(Mimas_Window* const window, Mimas_Rect const* const regio
     mimas_platform_clip_cursor(window, region);
 }
 
+void mimas_lock_cursor() {
+    mimas_platform_lock_cursor();
+}
+
+void mimas_unlock_cursor() {
+    mimas_platform_unlock_cursor();
+}
+
+void mimas_lock_cursor_to_window(Mimas_Window* window) {
+    mimas_platform_lock_cursor_to_window(window);
+}
+
+void mimas_unlock_cursor_from_window() {
+    mimas_platform_unlock_cursor_from_window();
+}
+
 void mimas_lock_cursor(Mimas_Window* const window) {
     mimas_platform_lock_cursor(window);
 }

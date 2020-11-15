@@ -32,8 +32,10 @@ void mimas_platform_maximize_window(Mimas_Window* window);
 Mimas_Key_Action mimas_platform_get_key(Mimas_Key button);
 
 void mimas_platform_clip_cursor(Mimas_Window* window, Mimas_Rect const* region);
-void mimas_platform_lock_cursor(Mimas_Window* const window);
-void mimas_platform_unlock_cursor(Mimas_Window* const window);
+void mimas_platform_lock_cursor();
+void mimas_platform_unlock_cursor();
+void mimas_platform_lock_cursor_to_window(Mimas_Window* window);
+void mimas_platform_unlock_cursor_from_window();
 void mimas_platform_set_cursor_pos(mimas_i32 const x, mimas_i32 const y);
 void mimas_platform_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 Mimas_Cursor* mimas_platform_create_standard_cursor(Mimas_Standard_Cursor cursor);
