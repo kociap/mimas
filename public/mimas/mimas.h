@@ -339,11 +339,11 @@ MIMAS_API void mimas_clip_cursor(Mimas_Window* window, Mimas_Rect const* region)
 // Calling this function has no effect when the cursor is locked or has been clipped by mimas_clip_cursor.
 // To unlock the cursor call mimas_unlock_cursor.
 //
-MIMAS_API void mimas_lock_cursor();
+MIMAS_API void mimas_lock_cursor(void);
 
 // mimas_unlock_cursor
 //
-MIMAS_API void mimas_unlock_cursor();
+MIMAS_API void mimas_unlock_cursor(void);
 
 // mimas_lock_cursor_to_window
 // Saves the position of the cursor, centers the cursor on window and locks it preventing it from moving.
@@ -356,7 +356,7 @@ MIMAS_API void mimas_lock_cursor_to_window(Mimas_Window* window);
 // mimas_unlock_cursor_from_window
 // Unlocks the cursor and restores its position to the position saved by mimas_lock_cursor_to_window.
 //
-MIMAS_API void mimas_unlock_cursor_from_window();
+MIMAS_API void mimas_unlock_cursor_from_window(void);
 
 MIMAS_API void mimas_get_cursor_pos(mimas_i32* x, mimas_i32* y);
 MIMAS_API void mimas_set_cursor_pos(mimas_i32 x, mimas_i32 y);
