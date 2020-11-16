@@ -339,7 +339,10 @@ MIMAS_API void mimas_clip_cursor(Mimas_Window* window, Mimas_Rect const* region)
 // Calling this function has no effect when the cursor is locked or has been clipped by mimas_clip_cursor.
 // To unlock the cursor call mimas_unlock_cursor.
 //
-MIMAS_API void mimas_lock_cursor(void);
+// Parameters:
+// window - the window to send the mouse move events to.
+//
+MIMAS_API void mimas_lock_cursor(Mimas_Window* window);
 
 // mimas_unlock_cursor
 //
@@ -350,6 +353,9 @@ MIMAS_API void mimas_unlock_cursor(void);
 // The cursor may only be locked to a single window at a time. It must be unlocked before it may be locked again.
 // Calling this function has no effect when the cursor is locked or has been clipped by mimas_clip_cursor.
 // To unlock the cursor call mimas_unlock_cursor_from_window.
+//
+// Parameters:
+// window - the window onto which to center the cursor and send events to.
 //
 MIMAS_API void mimas_lock_cursor_to_window(Mimas_Window* window);
 

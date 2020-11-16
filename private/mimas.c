@@ -229,26 +229,6 @@ Mimas_Key_Action mimas_get_key(Mimas_Key const key) {
     return mimas_platform_get_key(key);
 }
 
-void mimas_clip_cursor(Mimas_Window* const window, Mimas_Rect const* const region) {
-    mimas_platform_clip_cursor(window, region);
-}
-
-void mimas_lock_cursor(void) {
-    mimas_platform_lock_cursor();
-}
-
-void mimas_unlock_cursor(void) {
-    mimas_platform_unlock_cursor();
-}
-
-void mimas_lock_cursor_to_window(Mimas_Window* window) {
-    mimas_platform_lock_cursor_to_window(window);
-}
-
-void mimas_unlock_cursor_from_window(void) {
-    mimas_platform_unlock_cursor_from_window();
-}
-
 void mimas_set_cursor_pos(mimas_i32 const x, mimas_i32 const y) {
     mimas_platform_set_cursor_pos(x, y);
 }

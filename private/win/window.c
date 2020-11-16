@@ -913,9 +913,9 @@ void mimas_platform_maximize_window(Mimas_Window* const window) {
     ShowWindow(native_window->handle, SW_MAXIMIZE);
 }
 
-void mimas_platform_clip_cursor(Mimas_Window* const window, Mimas_Rect const* const region) {
+void mimas_clip_cursor(Mimas_Window* const window, Mimas_Rect const* const region) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    if(_mimas->cursor_locked) {
+    if(_mimas->locked_cursor_window) {
         return;
     }
     
@@ -931,25 +931,23 @@ void mimas_platform_clip_cursor(Mimas_Window* const window, Mimas_Rect const* co
             clip_cursor_to_window(window, &clip_region);
         }
 
-        _mimas->cursor_clipped = mimas_true;
         _mimas->clipped_cursor_window = window;
     } else {
         if(_mimas->active_window == _mimas->clipped_cursor_window) {
             ClipCursor(NULL);
         }
 
-        _mimas->cursor_clipped = mimas_false;
         _mimas->clipped_cursor_window = NULL;
     }
 }
 
-void mimas_platform_lock_cursor(void) {
+void mimas_lock_cursor(Mimas_Window* const window) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    if(_mimas->cursor_locked || _mimas->cursor_clipped) {
+    if(_mimas->locked_cursor_window || _mimas->clipped_cursor_window) {
         return;
     }
 
-    _mimas->cursor_locked = mimas_true;
+    _mimas->locked_cursor_window = window;
     // Reset cursor position
     _mimas->cursor_virtual_pos_x = 0;
     _mimas->cursor_virtual_pos_y = 0;
@@ -960,23 +958,21 @@ void mimas_platform_lock_cursor(void) {
     ClipCursor(&clip_region);
 }
 
-void mimas_platform_unlock_cursor(void) {
+void mimas_unlock_cursor(void) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    if(!_mimas->cursor_locked || _mimas->locked_cursor_window) {
+    if(_mimas->locked_cursor_window) {
         return;
     }
 
     ClipCursor(NULL);
-    _mimas->cursor_locked = mimas_false;
 }
 
-void mimas_platform_lock_cursor_to_window(Mimas_Window* const window) {
+void mimas_lock_cursor_to_window(Mimas_Window* const window) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    if(_mimas->cursor_locked || _mimas->cursor_clipped) {
+    if(_mimas->locked_cursor_window || _mimas->clipped_cursor_window) {
         return;
     }
 
-    _mimas->cursor_locked = mimas_true;
     _mimas->locked_cursor_window = window;
     // Reset cursor position
     _mimas->cursor_virtual_pos_x = 0;
@@ -986,9 +982,9 @@ void mimas_platform_lock_cursor_to_window(Mimas_Window* const window) {
     }
 }
 
-void mimas_platform_unlock_cursor_from_window(void) {
+void mimas_unlock_cursor_from_window(void) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    if(!_mimas->cursor_locked || !_mimas->locked_cursor_window) {
+    if(!_mimas->locked_cursor_window || !_mimas->clipped_cursor_window) {
         return;
     }
 
@@ -996,6 +992,5 @@ void mimas_platform_unlock_cursor_from_window(void) {
         ClipCursor(NULL);
     }
 
-    _mimas->cursor_locked = mimas_false;
     _mimas->locked_cursor_window = NULL;
 }
