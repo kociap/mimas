@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #include <hidusage.h>
+#include <combaseapi.h>
 
 static mimas_u32 get_default_window_styles(void) {
     return WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
@@ -696,21 +697,26 @@ mimas_bool mimas_platform_init(Mimas_Backend const backend, Mimas_Init_Options c
     _mimas->default_cursor = mimas_platform_create_standard_cursor(MIMAS_CURSOR_ARROW);
     _mimas_install_input_listener();
 
+    // Initialize COM for the file dialog
+    CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
     return mimas_true;
 }
 
 void mimas_platform_terminate(Mimas_Backend const backend) {
+    CoUninitialize();
+    _mimas_uninstall_input_listener();
+
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    mimas_platform_destroy_cursor(_mimas->default_cursor);
+
     if(backend == MIMAS_BACKEND_GL) {
         mimas_platform_terminate_gl_backend();
     } else {
         mimas_platform_terminate_vk_backend();
     }
 
-    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas->platform;
-    HWND const dummy_hwnd = ((Mimas_Win_Window*)platform->dummy_window->native_window)->handle;
-    _mimas_uninstall_input_listener();
-    mimas_platform_destroy_cursor(_mimas->default_cursor);
     destroy_native_window(platform->dummy_window);
     unregister_window_class();
     free(platform);
