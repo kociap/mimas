@@ -27,19 +27,16 @@ static mimas_u32 get_default_extended_window_styles(void) {
     return WS_EX_APPWINDOW;
 }
 
-static void clip_cursor_to_window(Mimas_Window* const window, Mimas_Rect const* const region) {
-    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
-    RECT clip_region = { .left = region->left, .top = region->top, .right = region->right, .bottom = region->bottom };
-    ClientToScreen(native_window->handle, (POINT*)&clip_region.left);
-    ClientToScreen(native_window->handle, (POINT*)&clip_region.right);
-    ClipCursor(&clip_region);
-}
-
-static void lock_cursor_to_window(Mimas_Window* const window) {
+static Mimas_Rect get_client_rect(Mimas_Window* const window) {
     Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
     RECT client;
     GetClientRect(native_window->handle, &client);
-    RECT clip_region = { .left = client.right / 2, .right = client.right / 2 + 1, .top = client.bottom / 2, .bottom = client.bottom / 2 + 1 };
+    return *(Mimas_Rect*)&client;
+}
+
+static void clip_cursor_to_window(Mimas_Window* const window, Mimas_Rect const* const region) {
+    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+    RECT clip_region = {.left = region->left, .top = region->top, .right = region->right, .bottom = region->bottom};
     ClientToScreen(native_window->handle, (POINT*)&clip_region.left);
     ClientToScreen(native_window->handle, (POINT*)&clip_region.right);
     ClipCursor(&clip_region);
@@ -300,12 +297,12 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                     mimas_bool const mouse_move_relative = !(mouse->usFlags & MOUSE_MOVE_ABSOLUTE);
                     if(mouse_move_relative && _mimas->locked_cursor_window) {
                         Mimas_Window* window = _mimas->locked_cursor_window;
-                        window->cursor_virtual_pos_x += mouse->lLastX;
-                        window->cursor_virtual_pos_y += mouse->lLastY;
+                        _mimas->cursor_virtual_pos_x += mouse->lLastX;
+                        _mimas->cursor_virtual_pos_y += mouse->lLastY;
                         if(window->callbacks.cursor_pos) {
-                            window->callbacks.cursor_pos(window, window->cursor_virtual_pos_x, window->cursor_virtual_pos_y, window->callbacks.cursor_pos_data);
+                            window->callbacks.cursor_pos(window, _mimas->cursor_virtual_pos_x, _mimas->cursor_virtual_pos_y, window->callbacks.cursor_pos_data);
                         }
-                    } 
+                    }
                     // TODO: absolute mouse move
                     // TODO: virtual desktop
                 } break;
@@ -319,15 +316,14 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
         return DefWindowProcW(hwnd, msg, wparam, lparam);
     } else {
         {
-            mimas_bool mouse_button_down = msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN || msg == WM_MBUTTONDOWN || msg == WM_XBUTTONDOWN;
-            // If a window clips a cursor, we want to clip it only when the user clicks in client area or activates the window via keyboard.
             // If a window receives mouse button events, it's active.
-            if(window && window->cursor_locked && mouse_button_down) {
-                _mimas->locked_cursor_window = window;
-                lock_cursor_to_window(window);
-            } else if(window && window->cursor_clipped && mouse_button_down) {
-                _mimas->clipped_cursor_window = window;
-                clip_cursor_to_window(window, &window->clip_region);
+            mimas_bool const mouse_button_down = msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN || msg == WM_MBUTTONDOWN || msg == WM_XBUTTONDOWN;
+            // We clip the cursor on each mouse button event. The reason is that we might not clip it when a window is being activated due to 
+            // non-client activate (we want to avoid cursor clipping when the user is e.g. clicking the titlebar, dragging the window).
+            if(window && _mimas->clipped_cursor_window == window && mouse_button_down) {
+                Mimas_Rect const client = get_client_rect(window);
+                Mimas_Rect const clip_rect = crop_rect(&_mimas->cursor_clip_region, &client);
+                clip_cursor_to_window(window, &clip_rect);
             }
         }
 
@@ -339,6 +335,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
             } break;
 
             case WM_CAPTURECHANGED: {
+                // TODO: Figure out what this does
                 if(lparam == 0) {
                     Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
                     native_window->non_client_activate = mimas_false;
@@ -352,18 +349,18 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                     SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER);
                 }
 
-                WORD active = LOWORD(wparam);
+                WORD const active = LOWORD(wparam);
                 if(active) {
                     _mimas->active_window = window;
 
                     Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
-                    // Do not clip cursor if the window is activated by mouse click in non-client area.
-                    if(!native_window->non_client_activate && window->cursor_locked) {
-                        _mimas->locked_cursor_window = window;
-                        lock_cursor_to_window(window);
-                    } else if(!native_window->non_client_activate && window->cursor_clipped) {
-                        _mimas->clipped_cursor_window = window;
-                        clip_cursor_to_window(window, &window->clip_region);
+                    // Do not clip the cursor if the window is activated by mouse click in non-client area
+                    if(!native_window->non_client_activate) {
+                        if(_mimas->clipped_cursor_window == window) {
+                            Mimas_Rect const client = get_client_rect(window);
+                            Mimas_Rect const clip_rect = crop_rect(&_mimas->cursor_clip_region, &client);
+                            clip_cursor_to_window(window, &clip_rect);
+                        }
                     }
 
                     if(window->callbacks.window_activate) {
@@ -383,11 +380,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                         window->callbacks.window_activate(window, mimas_false, window->callbacks.window_activate_data);
                     }
 
-                    if(window->cursor_locked) {
-                        _mimas->locked_cursor_window = NULL;
-                        ClipCursor(NULL);
-                    } else if(window->cursor_clipped) {
-                        _mimas->clipped_cursor_window = NULL;
+                    if(_mimas->clipped_cursor_window == window) {
                         ClipCursor(NULL);
                     }
 
@@ -411,7 +404,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
 
             case WM_NCHITTEST: {
                 if(window->display) {
-                    // Do not run user-defined hittest on fullscreen windows.
+                    // Do not run user-defined hittest on fullscreen windows
                     break;
                 }
 
@@ -638,6 +631,7 @@ static void destroy_native_window(Mimas_Window* const window) {
 
 mimas_bool mimas_platform_init(Mimas_Backend const backend, Mimas_Init_Options const* const options) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    // TODO: We do not free _mimas->displays anywhere as far as I know, so it's an obvious leak
     _mimas->displays = _mimas_get_connected_displays(&_mimas->display_count);
     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)malloc(sizeof(Mimas_Win_Platform));
     if(!platform) {
@@ -652,6 +646,8 @@ mimas_bool mimas_platform_init(Mimas_Backend const backend, Mimas_Init_Options c
     mimas_bool const register_res = register_window_class();
     if(!register_res) {
         // TODO: Error
+        free(platform);
+        _mimas->platform = NULL;
         return mimas_false;
     }
 
@@ -668,9 +664,9 @@ mimas_bool mimas_platform_init(Mimas_Backend const backend, Mimas_Init_Options c
     HWND const dummy_hwnd = ((Mimas_Win_Window*)dummy_window->native_window)->handle;
     SetPropW(dummy_hwnd, L"global_input_handler", (HANDLE)mimas_true);
     // If the program is launched with STARTUPINFO, the first call to ShowWindow will ignore the nCmdShow param,
-    //   therefore we call it here to clear that behaviour...
+    // therefore we call it here to clear that behaviour...
     ShowWindow(dummy_hwnd, SW_HIDE);
-    // ... and call it again to make sure it's hidden.
+    // ...and call it again to make sure it's hidden.
     ShowWindow(dummy_hwnd, SW_HIDE);
 
     MSG msg;
@@ -689,6 +685,7 @@ mimas_bool mimas_platform_init(Mimas_Backend const backend, Mimas_Init_Options c
         }
     } else {
         if(!mimas_platform_init_vk_backend()) {
+            destroy_native_window(dummy_window);
             unregister_window_class();
             free(platform);
             _mimas->platform = NULL;
@@ -744,6 +741,7 @@ void mimas_platform_poll_events(void) {
 }
 
 void mimas_platform_fullscreen_window(Mimas_Window* const window, Mimas_Display* const display) {
+    // TODO: cursor locking/clipping when fullscreening
     if(display) {
         window->display = display;
         Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
@@ -788,10 +786,12 @@ void mimas_platform_set_window_pos(Mimas_Window* const window, mimas_i32 const x
         SetWindowPos(native_window->handle, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOACTIVATE);
 
         Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-        if(_mimas->locked_cursor_window == window) {
-            lock_cursor_to_window(window);
-        } else if(_mimas->clipped_cursor_window == window) {
-            clip_cursor_to_window(window, &window->clip_region);
+        if(_mimas->active_window == window) {
+            if(_mimas->clipped_cursor_window == window) {
+                Mimas_Rect const client = get_client_rect(window);
+                Mimas_Rect const clip_rect = crop_rect(&_mimas->cursor_clip_region, &client);
+                clip_cursor_to_window(window, &clip_rect);
+            }
         }
     }
 }
@@ -817,10 +817,12 @@ void mimas_platform_set_window_content_pos(Mimas_Window* const window, mimas_i32
         }
 
         Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-        if(_mimas->locked_cursor_window == window) {
-            lock_cursor_to_window(window);
-        } else if(_mimas->clipped_cursor_window == window) {
-            clip_cursor_to_window(window, &window->clip_region);
+        if(_mimas->active_window == window) {
+            if(_mimas->clipped_cursor_window == window) {
+                Mimas_Rect const client = get_client_rect(window);
+                Mimas_Rect const clip_rect = crop_rect(&_mimas->cursor_clip_region, &client);
+                clip_cursor_to_window(window, &clip_rect);
+            }
         }
     }
 }
@@ -846,13 +848,11 @@ void mimas_platform_set_window_content_size(Mimas_Window*const window, mimas_i32
         }
 
         Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-        if(_mimas->locked_cursor_window == window) {
-            lock_cursor_to_window(window);
-        } else if(window->cursor_clipped) {
-            Mimas_Rect const client = { 0, 0, width, height };
-            window->clip_region = crop_rect(&window->clip_region, &client);
+        if(_mimas->active_window == window) {
             if(_mimas->clipped_cursor_window == window) {
-                clip_cursor_to_window(window, &window->clip_region);
+                Mimas_Rect const client = { 0, 0, width, height };
+                Mimas_Rect const clip_rect = crop_rect(&_mimas->cursor_clip_region, &client);
+                clip_cursor_to_window(window, &clip_rect);
             }
         }
     }
@@ -891,55 +891,57 @@ void mimas_platform_maximize_window(Mimas_Window* const window) {
     ShowWindow(native_window->handle, SW_MAXIMIZE);
 }
 
-void mimas_platform_clip_cursor(Mimas_Window* const window, Mimas_Rect const* const region) {
+void mimas_clip_cursor(Mimas_Window* const window, Mimas_Rect const* const region) {
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    if(_mimas->locked_cursor_window) {
+        return;
+    }
+    
     if(region) {
-        mimas_platform_unlock_cursor(window);
-
-        window->cursor_clipped = mimas_true;
         Mimas_Rect corrected_region = *region;
         corrected_region.left = min_i32(region->left, region->right);
         corrected_region.top = min_i32(region->top, region->bottom);
-        Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
-        RECT client;
-        GetClientRect(native_window->handle, &client);
-        window->clip_region = crop_rect(&corrected_region, (Mimas_Rect*)&client);
-
-        Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+        _mimas->cursor_clip_region = corrected_region;
         if(_mimas->active_window == window) {
-            _mimas->clipped_cursor_window = window;
-            clip_cursor_to_window(window, &window->clip_region);
+            // Correct the region so that it doesn't extend outside the client area
+            Mimas_Rect const client = get_client_rect(window); 
+            Mimas_Rect const clip_region = crop_rect(&corrected_region, (Mimas_Rect*)&client);
+            clip_cursor_to_window(window, &clip_region);
         }
+
+        _mimas->clipped_cursor_window = window;
     } else {
-        window->cursor_clipped = mimas_false;
-        Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-        if(_mimas->clipped_cursor_window == window) {
+        if(_mimas->active_window == _mimas->clipped_cursor_window) {
             ClipCursor(NULL);
-            _mimas->clipped_cursor_window = NULL;
         }
+
+        _mimas->clipped_cursor_window = NULL;
     }
 }
 
-void mimas_platform_lock_cursor(Mimas_Window* const window) {
-    mimas_platform_clip_cursor(window, NULL);
+void mimas_lock_cursor(Mimas_Window* const window) {
+    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
+    if(_mimas->locked_cursor_window || _mimas->clipped_cursor_window) {
+        return;
+    }
 
-    window->cursor_locked = mimas_true;
+    _mimas->locked_cursor_window = window;
     // Reset cursor position
-    // TODO: Choose meaningful values?
-    window->cursor_virtual_pos_x = 0;
-    window->cursor_virtual_pos_y = 0;
+    _mimas->cursor_virtual_pos_x = 0;
+    _mimas->cursor_virtual_pos_y = 0;
 
-    Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    if(_mimas->active_window == window) {
-        _mimas->locked_cursor_window = window;
-        lock_cursor_to_window(window);
-    }
+    mimas_i32 x, y;
+    mimas_platform_get_cursor_pos(&x, &y);
+    RECT clip_region = {.left = x, .right = x + 1, .top = y, .bottom = y + 1};
+    ClipCursor(&clip_region);
 }
 
-void mimas_platform_unlock_cursor(Mimas_Window* const window) {
-    window->cursor_locked = mimas_false;
+void mimas_unlock_cursor(void) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
-    if(_mimas->locked_cursor_window == window) {
-        ClipCursor(NULL);
-        _mimas->locked_cursor_window = NULL;
+    if(!_mimas->locked_cursor_window) {
+        return;
     }
+
+    ClipCursor(NULL);
+    _mimas->locked_cursor_window = NULL;
 }
