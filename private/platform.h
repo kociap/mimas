@@ -7,41 +7,7 @@
 mimas_bool mimas_platform_init(Mimas_Backend backend, Mimas_Init_Options const* options);
 void mimas_platform_terminate(Mimas_Backend backend);
 
-void mimas_platform_poll_events(void);
-
-Mimas_Display_Settings mimas_platform_get_display_settings(Mimas_Display* display);
-void mimas_platform_fullscreen_window(Mimas_Window* window, Mimas_Display* display);
-
 Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info);
 void mimas_platform_destroy_window(Mimas_Window* window);
-void mimas_platform_set_window_title(Mimas_Window* window, char const* title);
-
-void mimas_platform_set_window_pos(Mimas_Window* window, mimas_i32 x, mimas_i32 y);
-void mimas_platform_get_window_pos(Mimas_Window* window, mimas_i32* x, mimas_i32* y);
-void mimas_platform_set_window_content_pos(Mimas_Window* window, mimas_i32 x, mimas_i32 y);
-void mimas_platform_get_window_content_pos(Mimas_Window* window, mimas_i32* x, mimas_i32* y);
-void mimas_platform_set_window_content_size(Mimas_Window* window, mimas_i32 width, mimas_i32 height);
-void mimas_platform_get_window_content_size(Mimas_Window* window, mimas_i32* width, mimas_i32* height);
-
-void mimas_platform_show_window(Mimas_Window* window);
-void mimas_platform_hide_window(Mimas_Window* window);
-void mimas_platform_restore_window(Mimas_Window* window);
-void mimas_platform_minimize_window(Mimas_Window* window);
-void mimas_platform_maximize_window(Mimas_Window* window);
-
-Mimas_Key_Action mimas_platform_get_key(Mimas_Key button);
-
-void mimas_platform_set_cursor_pos(mimas_i32 const x, mimas_i32 const y);
-void mimas_platform_get_cursor_pos(mimas_i32* x, mimas_i32* y);
-Mimas_Cursor* mimas_platform_create_standard_cursor(Mimas_Standard_Cursor cursor);
-void mimas_platform_destroy_cursor(Mimas_Cursor* cursor);
-void mimas_platform_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor);
-
-char* mimas_platform_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dialog_Flags flags, 
-                                      Mimas_File_Filter* filters, mimas_u64 filter_count, char const* default_path);
-
-Mimas_System_Time mimas_platform_get_utc_system_time(void);
-Mimas_System_Time mimas_platform_get_local_system_time(void);
-double mimas_platform_get_time(void);
 
 #endif // !MIMAS_MIMAS_PLATFORM_H_INCLUDE

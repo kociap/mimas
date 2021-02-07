@@ -16,7 +16,7 @@ mimas_bool mimas_init_with_vk(Mimas_Init_Options const* const options) {
     return res;
 }
 
-char const** mimas_get_vk_extensions(mimas_i32* extension_count) {
+mimas_char8 const** mimas_get_vk_extensions(mimas_i32* extension_count) {
     return mimas_platform_get_vk_extensions(extension_count);
 }
 

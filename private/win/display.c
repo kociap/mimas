@@ -75,8 +75,8 @@ Mimas_Display** _mimas_get_connected_displays(mimas_i64* const count) {
             }
             memset(display, 0, sizeof(Mimas_Display));
             memset(native_display, 0, sizeof(Mimas_Win_Display));
-            WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, display_device.DeviceName, -1, native_display->display_name, ARRAY_SIZE(native_display->display_name), NULL, NULL);
-            WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, adapter_device.DeviceName, -1, native_display->adapter_name, ARRAY_SIZE(native_display->adapter_name), NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, display_device.DeviceName, -1, (char*)native_display->display_name, ARRAY_SIZE(native_display->display_name), NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, adapter_device.DeviceName, -1, (char*)native_display->adapter_name, ARRAY_SIZE(native_display->adapter_name), NULL, NULL);
             display->native_display = native_display;
             if(display_device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) {
                 memmove(displays + 1, displays, sizeof(Mimas_Display*) * display_count);
@@ -109,10 +109,10 @@ Mimas_Display** _mimas_get_connected_displays(mimas_i64* const count) {
     return displays;
 }
 
-Mimas_Display_Settings mimas_platform_get_display_settings(Mimas_Display* display) {
+Mimas_Display_Settings mimas_get_display_settings(Mimas_Display* display) {
     Mimas_Win_Display* const native_display = (Mimas_Win_Display*)display->native_display;
     WCHAR device_name[32] = {0};
-    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, native_display->adapter_name, -1, device_name, 32);
+    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, (char*)native_display->adapter_name, -1, device_name, 32);
     DEVMODEW devmode = {0};
     EnumDisplaySettingsW(device_name, ENUM_CURRENT_SETTINGS, &devmode);
     Mimas_Display_Settings settings = { .width = devmode.dmPelsWidth, .height = devmode.dmPelsHeight, .refresh_rate = devmode.dmDisplayFrequency };

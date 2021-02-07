@@ -20,11 +20,11 @@ static mimas_u64 get_performance_frequency(void) {
     return frequency;
 }
 
-double mimas_platform_get_time(void) {
+double mimas_get_time(void) {
     return (double)get_performance_counter() / (double)get_performance_frequency();
 }
 
-Mimas_System_Time mimas_platform_get_utc_system_time(void) {
+Mimas_System_Time mimas_get_utc_system_time(void) {
     SYSTEMTIME t = {0};
     GetSystemTime(&t);
     return (Mimas_System_Time){ .year = t.wYear, 
@@ -37,7 +37,7 @@ Mimas_System_Time mimas_platform_get_utc_system_time(void) {
                                 .milliseconds = t.wMilliseconds };
 }
 
-Mimas_System_Time mimas_platform_get_local_system_time(void) {
+Mimas_System_Time mimas_get_local_system_time(void) {
     SYSTEMTIME t = {0};
     GetLocalTime(&t);
     return (Mimas_System_Time){ .year = t.wYear, 

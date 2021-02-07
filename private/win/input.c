@@ -28,10 +28,6 @@ void _mimas_install_input_listener() {
 }
 
 void _mimas_uninstall_input_listener() {
-    Mimas_Internal* _mimas = _mimas_get_mimas_internal();   
-    Mimas_Win_Platform* platform  = (Mimas_Win_Platform*)_mimas->platform;
-    Mimas_Win_Window* dummy_window = (Mimas_Win_Window*)platform->dummy_window->native_window;
-
     RAWINPUTDEVICE rid_old[] = {
         {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_MOUSE, .dwFlags = RIDEV_REMOVE, .hwndTarget = NULL},
         {.usUsagePage = HID_USAGE_PAGE_GENERIC, .usUsage = HID_USAGE_GENERIC_KEYBOARD, .dwFlags = RIDEV_REMOVE, .hwndTarget = NULL},
@@ -42,18 +38,18 @@ void _mimas_uninstall_input_listener() {
     RegisterRawInputDevices(rid_old, 4, sizeof(RAWINPUTDEVICE));
 }
 
-void mimas_platform_set_cursor_pos(mimas_i32 const x, mimas_i32 const y) {
+void mimas_set_cursor_pos(mimas_i32 const x, mimas_i32 const y) {
     SetCursorPos(x, y);
 }
 
-void mimas_platform_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
+void mimas_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
     POINT p = {0};
     GetCursorPos(&p);
     *x = p.x;
     *y = p.y;
 }
 
-Mimas_Key_Action mimas_platform_get_key(Mimas_Key const key) {
+Mimas_Key_Action mimas_get_key(Mimas_Key const key) {
     if(key == MIMAS_KEY_UNKNOWN) {
         return MIMAS_KEY_RELEASE;
     } else {

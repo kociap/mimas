@@ -19,10 +19,6 @@ void mimas_terminate(void) {
     _mimas_terminate_internal();
 }
 
-void mimas_poll_events(void) {
-    mimas_platform_poll_events();
-}
-
 Mimas_Display* mimas_get_primary_display(void) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     return _mimas->displays[0];
@@ -32,14 +28,6 @@ Mimas_Display** mimas_get_displays(mimas_i64* count) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     *count = _mimas->display_count;
     return _mimas->displays;
-}
-
-Mimas_Display_Settings mimas_get_display_settings(Mimas_Display* display) {
-    return mimas_platform_get_display_settings(display);
-}
-
-void mimas_fullscreen_window(Mimas_Window* window, Mimas_Display* display) {
-    mimas_platform_fullscreen_window(window, display);
 }
 
 Mimas_Window* mimas_create_window(Mimas_Window_Create_Info const info) {
@@ -99,10 +87,6 @@ void mimas_destroy_window(Mimas_Window* window) {
 
 mimas_bool mimas_close_requested(Mimas_Window* window) {
     return window->close_requested;
-}
-
-void mimas_set_window_title(Mimas_Window* window, char const* title) {
-    mimas_platform_set_window_title(window, title);
 }
 
 void mimas_set_window_activate_callback(Mimas_Window* window, mimas_window_activate_callback callback, void* user_data) {
@@ -176,92 +160,7 @@ Mimas_Callback mimas_get_window_hittest(Mimas_Window* window) {
     return (Mimas_Callback){(void*)window->callbacks.hittest, NULL};
 }
 
-void mimas_set_window_pos(Mimas_Window* const window, mimas_i32 const x, mimas_i32 const y) {
-    mimas_platform_set_window_pos(window, x, y);
-}
-
-void mimas_get_window_pos(Mimas_Window* const window, mimas_i32* const x, mimas_i32* const y) {
-    mimas_platform_get_window_pos(window, x, y);
-}
-
-void mimas_set_window_content_pos(Mimas_Window* const window, mimas_i32 const x, mimas_i32 const y) {
-    mimas_platform_set_window_content_pos(window, x, y);
-}
-
-void mimas_get_window_content_pos(Mimas_Window* const window, mimas_i32* const x, mimas_i32* const y) {
-    mimas_platform_get_window_content_pos(window, x, y);
-}
-
-void mimas_set_window_content_size(Mimas_Window* const window, mimas_i32 const width, mimas_i32 const height) {
-    mimas_platform_set_window_content_size(window, width, height);
-}
-
-void mimas_get_window_content_size(Mimas_Window* const window, mimas_i32* const width, mimas_i32* const height) {
-    mimas_platform_get_window_content_size(window, width, height);
-}
-
 mimas_bool mimas_is_window_active(Mimas_Window* window) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     return _mimas->active_window == window;
-}
-
-void mimas_show_window(Mimas_Window* const window) {
-    mimas_platform_show_window(window);
-}
-
-void mimas_hide_window(Mimas_Window* const window) {
-    mimas_platform_hide_window(window);
-}
-
-void mimas_restore_window(Mimas_Window* const window) {
-    mimas_platform_restore_window(window);
-}
-
-void mimas_minimize_window(Mimas_Window* const window) {
-    mimas_platform_minimize_window(window);
-}
-
-void mimas_maximize_window(Mimas_Window* const window) {
-    mimas_platform_maximize_window(window);
-}
-
-Mimas_Key_Action mimas_get_key(Mimas_Key const key) {
-    return mimas_platform_get_key(key);
-}
-
-void mimas_set_cursor_pos(mimas_i32 const x, mimas_i32 const y) {
-    mimas_platform_set_cursor_pos(x, y);
-}
-
-void mimas_get_cursor_pos(mimas_i32* const x, mimas_i32* const y) {
-    mimas_platform_get_cursor_pos(x, y);
-}
-
-Mimas_Cursor* mimas_create_standard_cursor(Mimas_Standard_Cursor cursor) {
-    return mimas_platform_create_standard_cursor(cursor);
-}
-
-void mimas_destroy_cursor(Mimas_Cursor* cursor) {
-    mimas_platform_destroy_cursor(cursor);
-}
-
-void mimas_set_cursor(Mimas_Window* window, Mimas_Cursor* cursor) {
-    mimas_platform_set_cursor(window, cursor);
-}
-
-char* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dialog_Flags flags, 
-                             Mimas_File_Filter* filters, mimas_u64 filter_count, char const* default_path) {
-    return mimas_platform_open_file_dialog(type, flags, filters, filter_count, default_path);
-}
-
-Mimas_System_Time mimas_get_utc_system_time(void) {
-    return mimas_platform_get_utc_system_time();
-}
-
-Mimas_System_Time mimas_get_local_system_time(void) {
-    return mimas_platform_get_local_system_time();
-}
-
-double mimas_get_time(void) {
-    return mimas_platform_get_time();
 }

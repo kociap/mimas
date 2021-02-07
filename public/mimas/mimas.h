@@ -236,9 +236,11 @@ MIMAS_API Mimas_Display_Settings mimas_get_display_settings(Mimas_Display* displ
 MIMAS_API void mimas_fullscreen_window(Mimas_Window* window, Mimas_Display* display);
 
 typedef struct Mimas_Window_Create_Info {
+    mimas_char8 const* title;
     mimas_i32 width;
     mimas_i32 height;
-    char const* title;
+    mimas_i32 initial_pos_x;
+    mimas_i32 initial_pos_y;
     mimas_bool decorated;
 } Mimas_Window_Create_Info;
 
@@ -250,7 +252,7 @@ MIMAS_API mimas_bool mimas_close_requested(Mimas_Window* window);
 // 
 // title - pointer to null-terminated UTF-8 encoded string.
 //
-MIMAS_API void mimas_set_window_title(Mimas_Window* window, char const* title);
+MIMAS_API void mimas_set_window_title(Mimas_Window* window, mimas_char8 const* title);
 
 typedef struct Mimas_Callback {
     void* callback;
@@ -325,7 +327,7 @@ MIMAS_API Mimas_Key_Action mimas_get_key(Mimas_Key key);
 // mimas_clip_cursor
 // Confines the cursor to an area inside window defined by region.
 // The cursor may only be clipped to a single window at a time. It must be unclipped before it may be clipped to another window.
-// Calling this function has no effect if the cursor has been locked by mimas_lock_cursor or mimas_lock_cursor_to_window.
+// Calling this function has no effect if the cursor has been locked by mimas_lock_cursor.
 //
 // Parameters:
 // region - the clip region in screen coordinates relative to the top-left corner of the client area of the window.
@@ -391,17 +393,17 @@ typedef enum Mimas_File_Dialog_Type {
 
 typedef struct Mimas_File_Filter {
     // Display name of the filter
-    char const* name;
+    mimas_char8 const* name;
     // The actual filter string. An example of a filter string accepting only png files is "*.png"
     // To filter for multiple types in the same filter string you can separate filters by a semicolon: "*.png;*.jpg"
-    char const* filter;
+    mimas_char8 const* filter;
 } Mimas_File_Filter;
 
 // Opens a native file dialog. For an explanation on the different flags and filters, see comments for Mimas_File_Dialog_Flags and 
 // Mimas_File_Filter. If the file selection is canceled or no file was selected, this function returns NULL. Otherwise it returns a
 // pointer to a character array that has to be freed by the user, or NULL if the function failed for any other reason
-MIMAS_API char* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dialog_Flags flags, 
-                                       Mimas_File_Filter* filters, mimas_u64 filter_count, char const* default_path);
+MIMAS_API mimas_char8* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dialog_Flags flags, 
+                                       Mimas_File_Filter* filters, mimas_u64 filter_count, mimas_char8 const* default_path);
 
 // Time 
 
