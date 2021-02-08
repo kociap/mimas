@@ -14,7 +14,7 @@ void _mimas_install_input_listener() {
     HWND dummy_hwnd = dummy_window->handle;
 
     mimas_u32 flags = 0;
-    if(!platform->disable_raw_input_sink) {
+    if(platform->enable_raw_input_sink) {
         flags |= RIDEV_INPUTSINK;
     }
 

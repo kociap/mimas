@@ -389,7 +389,7 @@ static LRESULT window_proc(HWND const hwnd, UINT const msg, WPARAM const wparam,
                     // none of our windows are being activated), we also want to clear all the global keys to make sure that 
                     // none of the keys will be reported as pressed when the release happens after focus loss.
                     Mimas_Win_Platform* const platform = (Mimas_Win_Platform*)_mimas->platform;
-                    if(lparam == 0 && platform->disable_raw_input_sink) {
+                    if(lparam == 0 && !platform->enable_raw_input_sink) {
                         for(mimas_u32 i = 0; i < ARRAY_SIZE(platform->key_state); ++i) {
                             platform->key_state[i] = MIMAS_KEY_RELEASE;
                         }
@@ -649,7 +649,7 @@ mimas_bool mimas_platform_init(Mimas_Backend const backend, Mimas_Init_Options c
     memset(platform, 0, sizeof(Mimas_Win_Platform));
     _mimas->platform = platform;
 
-    platform->disable_raw_input_sink = options->capture_input_when_application_is_out_of_focus;
+    platform->enable_raw_input_sink = options->capture_input_when_application_is_out_of_focus;
 
     mimas_bool const register_res = register_window_class();
     if(!register_res) {

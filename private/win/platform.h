@@ -37,7 +37,7 @@ typedef struct Mimas_Win_Platform {
     Mimas_Key_Action key_state[256];
     Mimas_Window* dummy_window;
     // Whether the input events will be generated while the application is out of focus
-    mimas_bool disable_raw_input_sink;
+    mimas_bool enable_raw_input_sink;
 } Mimas_Win_Platform;
 
 Mimas_Display** _mimas_get_connected_displays(mimas_i64* const count);
