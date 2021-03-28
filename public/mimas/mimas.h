@@ -224,7 +224,7 @@ MIMAS_API Mimas_Display* mimas_get_primary_display(void);
 MIMAS_API Mimas_Display** mimas_get_displays(mimas_i64* count);
 MIMAS_API Mimas_Display_Settings mimas_get_display_settings(Mimas_Display* display);
 
-// mimas_fulscreen_window
+// mimas_fullscreen_window
 // Makes a window non-exclusive fullscreen on given display.
 //
 // If display is NULL, the window will be restored to normal mode. The window will not be restored to the previous size.
