@@ -13,8 +13,11 @@ typedef enum {
 } Mimas_GL_Profile;
 
 // mimas_init_with_gl
+// Initializes mimas to work with OpenGL.
+// The entire process is per monitor DPI aware.
 //
-// Returns: mimas_true if successfully initialized. mimas_false otherwise.
+// Returns:
+// mimas_true if successfully initialized. mimas_false otherwise.
 //
 MIMAS_API mimas_bool mimas_init_with_gl(Mimas_Init_Options const* options);
 

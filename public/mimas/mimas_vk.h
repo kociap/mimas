@@ -10,8 +10,11 @@ typedef struct VkSurfaceKHR_T* VkSurfaceKHR;
 struct VkAllocationCallbacks;
 
 // mimas_init_with_vk
+// Initializes mimas to work with Vulkan.
+// The entire process is per monitor DPI aware.
 //
-// Returns: mimas_true if successfully initialized. mimas_false otherwise.
+// Returns:
+// mimas_true if successfully initialized. mimas_false otherwise.
 //
 MIMAS_API mimas_bool mimas_init_with_vk(Mimas_Init_Options const* options);
 

@@ -7,14 +7,13 @@
 #include <platform_vk.h>
 
 #include <wingdi.h>
+#include <windef.h>
+#include <hidusage.h>
+#include <combaseapi.h>
 
 #include <stdlib.h>
 #include <string.h>
-
 #include <stdio.h>
-
-#include <hidusage.h>
-#include <combaseapi.h>
 
 static mimas_u32 get_default_window_styles(void) {
     return WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
@@ -638,6 +637,10 @@ static void destroy_native_window(Mimas_Window* const window) {
 }
 
 mimas_bool mimas_platform_init(Mimas_Backend const backend, Mimas_Init_Options const* const options) {
+    // Make the entire application per monitor DPI aware.
+    // Consider moving to Per Monitor V2.
+    SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     // TODO: We do not free _mimas->displays anywhere as far as I know, so it's an obvious leak
     _mimas->displays = _mimas_get_connected_displays(&_mimas->display_count);
