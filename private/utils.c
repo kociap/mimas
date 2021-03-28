@@ -1,5 +1,8 @@
 #include <utils.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 mimas_u8 _mimas_max_u8(mimas_u8 x, mimas_u8 y) {
     return x > y ? x : y;
 }
