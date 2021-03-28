@@ -102,7 +102,7 @@ mimas_char16* _mimas_utf8_to_utf16(mimas_char8 const* const buffer_utf8, mimas_i
         bytes_read += conv.bytes_read;
         // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars, which we expect to be the more common case.
         if(conv.codepoint <= 0xD7FF || (conv.codepoint >= 0xE000 && conv.codepoint <= 0xFFFF)) {
-            *buffer_utf16 = conv.codepoint;
+            *buffer_utf16_iter = conv.codepoint;
             buffer_utf16_iter += 1;
         } else {
             mimas_char16 const high_surrogate = 0xD800 + ((conv.codepoint - 0x10000) >> 10 & 0x3FF);
