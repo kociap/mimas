@@ -13,9 +13,13 @@
 #include <combaseapi.h>
 
 
-static IShellItem* create_shell_item_from_path(mimas_char8 const* path) {
-    if (!path) { return NULL;  }
-    mimas_char16* const wpath = _mimas_utf8_to_utf16(path, -1);
+static IShellItem* create_shell_item_from_path(Mimas_String_View path) {
+    mimas_i64 path_size = mimas_string_view_size_bytes(path);
+    if (path_size <= 0) { 
+        return NULL;
+    }
+
+    mimas_char16* const wpath = _mimas_utf8_to_utf16(path.begin, path_size);
     if (!wpath) {
         return NULL;
     }
@@ -27,9 +31,10 @@ static IShellItem* create_shell_item_from_path(mimas_char8 const* path) {
     return shell_item;
 }
 
-// New implementation using the COM api
-mimas_char8* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dialog_Flags user_flags, 
-                                      Mimas_File_Filter* filters, mimas_u64 filter_count, mimas_char8 const* default_path) {
+Mimas_String mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dialog_Flags user_flags, 
+                                    Mimas_File_Filter* filters, mimas_u64 filter_count, Mimas_String_View const default_path) {
+    // Implements the file dialog using the COM API.
+
     IFileDialog* dialog = NULL;
     // Create the file dialog instance. Note that the documentation says to pass the GUID's by reference, but the C API needs pointers.
     CLSID const* cls_id = NULL;
@@ -39,14 +44,14 @@ mimas_char8* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dial
         cls_id = &CLSID_FileSaveDialog;
     } else { 
         // User must specify either MIMAS_FILE_DIALOG_OPEN or MIMAS_FILE_DIALOG_SAVE for this function to work.
-        return NULL;  
+        return (Mimas_String){.begin = NULL, .end = NULL};
     }
 
     HRESULT hr = CoCreateInstance(cls_id, NULL, CLSCTX_INPROC_SERVER, &IID_IFileDialog, (void**)&dialog);
     UNUSED(hr);
 
     if (!dialog) {
-        return NULL;
+        return (Mimas_String){.begin = NULL, .end = NULL};
     }
     
     // Set options for the file dialog
@@ -59,7 +64,7 @@ mimas_char8* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dial
     dialog->lpVtbl->SetOptions(dialog, flags);
 
     IShellItem* default_folder = NULL;
-    if (default_path) {
+    if (mimas_string_view_size_bytes(default_path) > 0) {
         default_folder = create_shell_item_from_path(default_path);
     }
     if (default_folder) {
@@ -104,7 +109,7 @@ mimas_char8* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dial
             }
             free(filter_strings);
         }
-        return NULL;  
+        return (Mimas_String){.begin = NULL, .end = NULL};
     }
 
     PWSTR result_path = NULL;
@@ -120,12 +125,13 @@ mimas_char8* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dial
             }
             free(filter_strings);
         }
-        return NULL;  
+        return (Mimas_String){.begin = NULL, .end = NULL};
     }
 
     mimas_i64 const mb_buffer_size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, result_path, -1, NULL, 0, NULL, NULL);
-    mimas_char8* buffer = malloc(mb_buffer_size);
+    mimas_char8* const buffer = malloc(mb_buffer_size);
     WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, result_path, -1, (char*)buffer, mb_buffer_size, NULL, NULL);
+    Mimas_String const string = {.begin = buffer, .end = buffer + mb_buffer_size};
     
     CoTaskMemFree(result_path);
     result->lpVtbl->Release(result);
@@ -139,5 +145,5 @@ mimas_char8* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dial
         free(filter_strings);
     }
 
-    return buffer;
+    return string;
 }

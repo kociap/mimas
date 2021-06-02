@@ -203,6 +203,27 @@ typedef struct Mimas_Rect {
     mimas_i32 bottom;
 } Mimas_Rect;
 
+// Mimas_String
+// String buffer owning the memory.
+//
+typedef struct Mimas_String {
+    mimas_char8* begin;
+    mimas_char8* end;
+} Mimas_String;
+
+MIMAS_API mimas_i64 mimas_string_size_bytes(Mimas_String string);
+MIMAS_API void mimas_free_string(Mimas_String string);
+
+// Mimas_String_View
+// Non-owning view into a string buffer.
+//
+typedef struct Mimas_String_View {
+    mimas_char8 const* begin;
+    mimas_char8 const* end;
+} Mimas_String_View;
+
+MIMAS_API mimas_i64 mimas_string_view_size_bytes(Mimas_String_View string);
+
 typedef struct Mimas_Display Mimas_Display;
 typedef struct Mimas_Window Mimas_Window;
 
@@ -413,16 +434,30 @@ typedef enum Mimas_File_Dialog_Type {
 typedef struct Mimas_File_Filter {
     // Display name of the filter
     mimas_char8 const* name;
-    // The actual filter string. An example of a filter string accepting only png files is "*.png"
-    // To filter for multiple types in the same filter string you can separate filters by a semicolon: "*.png;*.jpg"
+    // The actual filter string. An example of a filter string accepting only png files is "*.png".
+    // To filter for multiple types in the same filter string you can separate filters by a semicolon: "*.png;*.jpg".
     mimas_char8 const* filter;
 } Mimas_File_Filter;
 
-// Opens a native file dialog. For an explanation on the different flags and filters, see comments for Mimas_File_Dialog_Flags and 
-// Mimas_File_Filter. If the file selection is canceled or no file was selected, this function returns NULL. Otherwise it returns a
-// pointer to a character array that has to be freed by the user, or NULL if the function failed for any other reason
-MIMAS_API mimas_char8* mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dialog_Flags flags, 
-                                       Mimas_File_Filter* filters, mimas_u64 filter_count, mimas_char8 const* default_path);
+// mimas_open_file_dialog
+// Opens a native file save dialog or file open dialog. 
+// For an explanation on the different flags and filters 
+// see comments for Mimas_File_Dialog_Flags and Mimas_File_Filter. 
+//
+// Parameters:
+//         type - the type of the dialog to open.
+//        flags - options that will change the behaviour of the dialog.
+//      filters - filter strings to use to filter cetrain types of files.
+// filter_count - number of filters present in filters.
+// default_path - the location the file dialog should be opened with.
+//
+// Returns:
+// Returns a string containing path that has to be freed by the user.
+// If the file selection is canceled, no file was selected or the function failed for any other reason, 
+// this function returns en empty string (nullptr). 
+//
+MIMAS_API Mimas_String mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dialog_Flags flags, 
+                                              Mimas_File_Filter* filters, mimas_u64 filter_count, Mimas_String_View default_path);
 
 // Time 
 

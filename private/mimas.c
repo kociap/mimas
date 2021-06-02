@@ -7,6 +7,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+mimas_i64 mimas_string_size_bytes(Mimas_String const string) {
+    return string.end - string.begin;
+}
+
+void mimas_free_string(Mimas_String const string) {
+    free(string.begin);
+}
+
+mimas_i64 mimas_string_view_size_bytes(Mimas_String_View const string) {
+    return string.end - string.begin;
+}
+
 void mimas_terminate(void) {
     Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
     for(Mimas_Window_List_Element* elem = _mimas->window_list; elem != NULL;) {
