@@ -131,7 +131,10 @@ Mimas_String mimas_open_file_dialog(Mimas_File_Dialog_Type type, Mimas_File_Dial
     mimas_i64 const mb_buffer_size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, result_path, -1, NULL, 0, NULL, NULL);
     mimas_char8* const buffer = malloc(mb_buffer_size);
     WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, result_path, -1, (char*)buffer, mb_buffer_size, NULL, NULL);
-    Mimas_String const string = {.begin = buffer, .end = buffer + mb_buffer_size};
+    // mb_buffer_size includes the null-terminator.
+    // We have to subtract 1 from the size because end is
+    // supposed to point to the null-terminator.
+    Mimas_String const string = {.begin = buffer, .end = buffer + mb_buffer_size - 1};
     
     CoTaskMemFree(result_path);
     result->lpVtbl->Release(result);
