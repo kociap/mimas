@@ -261,6 +261,23 @@ MIMAS_API Mimas_Display_Settings mimas_get_display_settings(Mimas_Display* displ
 //
 MIMAS_API void mimas_fullscreen_window(Mimas_Window* window, Mimas_Display* display);
 
+typedef struct Mimas_Flash_Info {
+    // The number of flashes to perform
+    mimas_i32 count;
+    // Time in milliseconds between flashes. 
+    // May be set to 0 to use the cursor blink rate.
+    mimas_i32 interval;
+    // Whether to flash the window
+    mimas_bool flash_window;
+    // Whether to flash the icon on the taskbar
+    mimas_bool flash_taskbar;
+} Mimas_Flash_Info;
+
+// mimas_flash_window
+// Flash the window. Does not change the active status of the window.
+//
+MIMAS_API void mimas_flash_window(Mimas_Window* window, Mimas_Flash_Info info);
+
 typedef struct Mimas_Window_Create_Info {
     mimas_char8 const* title;
     mimas_i32 width;

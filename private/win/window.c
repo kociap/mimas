@@ -779,6 +779,28 @@ void mimas_fullscreen_window(Mimas_Window* const window, Mimas_Display* const di
     }
 }
 
+void mimas_flash_window(Mimas_Window* const window, Mimas_Flash_Info const info) {
+    Mimas_Win_Window* const native_window = (Mimas_Win_Window*)window->native_window;
+    DWORD flags = 0;
+    if(info.flash_window) {
+        flags |= FLASHW_CAPTION;
+    }
+
+    if(info.flash_taskbar) {
+        flags |= FLASHW_TRAY;
+    }
+
+    FLASHWINFO flash_info = {
+        .cbSize = sizeof(FLASHWINFO), 
+        .hwnd = native_window->handle, 
+        .dwFlags = flags,
+        .uCount = info.count, 
+        .dwTimeout = info.interval,
+    };
+
+    FlashWindowEx(&flash_info);
+}
+
 Mimas_Window* mimas_platform_create_window(Mimas_Window_Create_Info const info) {
     Mimas_Window* const window = create_native_window(info);
     return window;
