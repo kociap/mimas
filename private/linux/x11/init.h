@@ -1,13 +1,16 @@
 #ifndef MIMAS_INIT_H
 #define MIMAS_INIT_H
 
-#include <mimas/mimas.h>
 #include <X11/Xlib.h>
+#include <mimas/mimas.h>
 
 typedef Display* (*PFN_XOpenDisplay)(char const*);
 typedef int (*PFN_XDefaultScreen)(Display*);
 typedef Screen* (*PFN_XScreenOfDisplay)(Display*, int);
-typedef Window (*PFN_XCreateSimpleWindow)(Display*, Window, int, int, unsigned int, unsigned int, unsigned int, unsigned long, unsigned long);
+typedef Window (*PFN_XCreateSimpleWindow)(Display*, Window, int, int,
+                                          unsigned int, unsigned int,
+                                          unsigned int, unsigned long,
+                                          unsigned long);
 typedef Window (*PFN_XRootWindow)(Display*, int);
 typedef unsigned long (*PFN_XBlackPixel)(Display*, int);
 typedef unsigned long (*PFN_XWhitePixel)(Display*, int);
