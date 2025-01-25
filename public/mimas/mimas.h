@@ -40,7 +40,7 @@ typedef int mimas_i32;
 typedef unsigned int mimas_u32;
 typedef long long mimas_i64;
 typedef unsigned long long mimas_u64;
-typedef mimas_u8 mimas_char8;
+typedef char mimas_char8;
 typedef mimas_u16 mimas_char16;
 typedef mimas_u32 mimas_char32;
 
