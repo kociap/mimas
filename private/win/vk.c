@@ -1,8 +1,12 @@
 #include <internal.h>
-#include <platform_vk.h>
+#include <mimas/mimas_vk.h>
 #include <win/platform.h>
 
 static HMODULE vulkan_module = NULL;
+
+typedef mimas_u32 VkStructureType;
+#define VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR 1000009000
+typedef mimas_u32 VkFlags;
 
 typedef struct VkWin32SurfaceCreateInfoKHR {
   VkStructureType sType;
@@ -17,11 +21,11 @@ typedef PFN_vkVoidFunction (*PFN_vkGetInstanceProcAddr)(VkInstance,
                                                         char const*);
 static PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
 
-typedef VkResult (*PFN_vkCreateWin32SurfaceKHR)(
+typedef mimas_i32 (*PFN_vkCreateWin32SurfaceKHR)(
   VkInstance, VkWin32SurfaceCreateInfoKHR const*,
   struct VkAllocationCallbacks const*, VkSurfaceKHR*);
 
-mimas_bool mimas_platform_init_vk_backend(void)
+mimas_bool _mimas_init_backend_vk(void)
 {
   vulkan_module = LoadLibraryW(L"vulkan-1.dll");
   if(vulkan_module) {
@@ -34,12 +38,12 @@ mimas_bool mimas_platform_init_vk_backend(void)
   }
 }
 
-void mimas_platform_terminate_vk_backend(void)
+void _mimas_terminate_backend_vk(void)
 {
   FreeLibrary(vulkan_module);
 }
 
-mimas_char8 const** mimas_platform_get_vk_extensions(mimas_i32* extension_count)
+mimas_char8 const** mimas_get_vk_extensions(mimas_i32* extension_count)
 {
   static mimas_char8 const* vk_win_extensions[] = {
     (mimas_char8 const*)"VK_KHR_surface",
@@ -48,7 +52,7 @@ mimas_char8 const** mimas_platform_get_vk_extensions(mimas_i32* extension_count)
   return vk_win_extensions;
 }
 
-mimas_i32 mimas_platform_create_vk_surface(
+mimas_i32 mimas_create_vk_surface(
   Mimas_Window* const window, VkInstance const instance,
   struct VkAllocationCallbacks const* allocation_callbacks,
   VkSurfaceKHR* surface)

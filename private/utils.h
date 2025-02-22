@@ -1,5 +1,4 @@
-#ifndef MIMAS_UTILS_H_INCLUDE
-#define MIMAS_UTILS_H_INCLUDE
+#pragma once
 
 #include <mimas/mimas.h>
 
@@ -27,5 +26,3 @@ Mimas_Rect _mimas_crop_rect(Mimas_Rect const* source, Mimas_Rect const* target);
 //
 mimas_char16* _mimas_utf8_to_utf16(mimas_char8 const* buffer_utf8,
                                    mimas_i64 count);
-
-#endif // !MIMAS_UTILS_H_INCLUDE

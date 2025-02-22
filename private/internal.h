@@ -1,5 +1,4 @@
-#ifndef MIMAS_MIMAS_INTERNAL_H_INCLUDE
-#define MIMAS_MIMAS_INTERNAL_H_INCLUDE
+#pragma once
 
 #include <mimas/mimas.h>
 
@@ -70,5 +69,3 @@ struct Mimas_Window {
     mimas_window_hittest hittest;
   } callbacks;
 };
-
-#endif // !MIMAS_MIMAS_INTERNAL_H_INCLUDE

@@ -36,6 +36,6 @@ Mimas_System_Time mimas_platform_get_local_system_time(void)
 double mimas_platform_get_time(void)
 {
   struct timespec ts = {0};
-  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
   return (double)ts.tv_sec + (double)ts.tv_nsec * 0.000000001;
 }

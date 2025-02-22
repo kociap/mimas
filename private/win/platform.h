@@ -1,5 +1,4 @@
-#ifndef MIMAS_WIN_PLATFORM_H_INCLUDE
-#define MIMAS_WIN_PLATFORM_H_INCLUDE
+#pragma once
 
 #define NOMINMAX 1
 #define WIN32_LEAN_AND_MEAN 1
@@ -43,11 +42,14 @@ typedef struct Mimas_Win_Platform {
 Mimas_Display** _mimas_get_connected_displays(mimas_i64* const count);
 void _mimas_free_displays(Mimas_Display** displays, mimas_i64 const count);
 
+mimas_bool _mimas_init_backend_gl(void);
+void _mimas_terminate_backend_gl(void);
+mimas_bool _mimas_init_backend_vk(void);
+void _mimas_terminate_backend_vk(void);
+
 // _mimas_install_input_listener
 // Installs the global raw input listener
 //
 void _mimas_install_input_listener();
 
 void _mimas_uninstall_input_listener();
-
-#endif // !MIMAS_WIN_PLATFORM_H_INCLUDE

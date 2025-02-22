@@ -2,8 +2,6 @@
 
 #include <internal.h>
 #include <platform.h>
-#include <platform_gl.h>
-#include <platform_vk.h>
 #include <utils.h>
 
 #include <combaseapi.h>

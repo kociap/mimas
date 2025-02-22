@@ -2,11 +2,7 @@ target_sources(mimas
   PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/internal.c"
   "${CMAKE_CURRENT_SOURCE_DIR}/internal.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mimas_vk.c"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mimas_gl.c"
   "${CMAKE_CURRENT_SOURCE_DIR}/mimas.c"
-  "${CMAKE_CURRENT_SOURCE_DIR}/platform_vk.h"
-  "${CMAKE_CURRENT_SOURCE_DIR}/platform_gl.h"
   "${CMAKE_CURRENT_SOURCE_DIR}/platform.h"
   "${CMAKE_CURRENT_SOURCE_DIR}/utils.c"
   "${CMAKE_CURRENT_SOURCE_DIR}/utils.h"

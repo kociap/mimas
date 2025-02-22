@@ -1,8 +1,6 @@
 #include <internal.h>
 #include <mimas/mimas.h>
 #include <platform.h>
-#include <platform_gl.h>
-#include <platform_vk.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +20,34 @@ mimas_i64 mimas_string_view_size_bytes(Mimas_String_View const string)
   return string.end - string.begin;
 }
 
+mimas_bool mimas_init_with_gl(Mimas_Init_Options const* const options)
+{
+  if(_mimas_is_initialized()) {
+    return mimas_true;
+  }
+
+  _mimas_init_internal(MIMAS_BACKEND_GL);
+  mimas_bool const res = mimas_platform_init(MIMAS_BACKEND_GL, options);
+  if(!res) {
+    _mimas_terminate_internal();
+  }
+  return res;
+}
+
+mimas_bool mimas_init_with_vk(Mimas_Init_Options const* const options)
+{
+  if(_mimas_is_initialized()) {
+    return mimas_true;
+  }
+
+  _mimas_init_internal(MIMAS_BACKEND_VK);
+  mimas_bool const res = mimas_platform_init(MIMAS_BACKEND_VK, options);
+  if(!res) {
+    _mimas_terminate_internal();
+  }
+  return res;
+}
+
 void mimas_terminate(void)
 {
   Mimas_Internal* const _mimas = _mimas_get_mimas_internal();
@@ -31,7 +57,7 @@ void mimas_terminate(void)
     elem = elem->next;
   }
   _mimas->window_list = NULL;
-  mimas_platform_terminate(_mimas->backend);
+  mimas_platform_terminate();
   _mimas_terminate_internal();
 }
 

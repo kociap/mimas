@@ -1,5 +1,4 @@
-#ifndef MIMAS_WIN_WGL_H_INCLUDE
-#define MIMAS_WIN_WGL_H_INCLUDE
+#pragma once
 
 #define NOMINMAX 1
 #define WIN32_LEAN_AND_MEAN 1
@@ -131,5 +130,3 @@ extern PFN_wglSwapIntervalEXT mimas_wglSwapIntervalEXT;
 extern PFN_wglGetSwapIntervalEXT mimas_wglGetSwapIntervalEXT;
 #define wglSwapIntervalEXT mimas_wglSwapIntervalEXT
 #define wglGetSwapIntervalEXT mimas_wglGetSwapIntervalEXT
-
-#endif // !MIMAS_WIN_WGL_H_INCLUDE

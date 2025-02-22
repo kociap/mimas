@@ -1,11 +1,11 @@
 #include <internal.h>
-#include <platform_gl.h>
+#include <mimas/mimas_gl.h>
 #include <win/platform.h>
 #include <win/wgl.h>
 
 #include <wingdi.h>
 
-mimas_bool mimas_platform_init_gl_backend(void)
+mimas_bool _mimas_init_backend_gl(void)
 {
   Mimas_Win_Platform* const platform =
     (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
@@ -18,14 +18,14 @@ mimas_bool mimas_platform_init_gl_backend(void)
   return mimas_true;
 }
 
-void mimas_platform_terminate_gl_backend(void)
+void _mimas_terminate_backend_gl(void)
 {
   mimas_unload_wgl();
 }
 
-Mimas_GL_Context*
-mimas_platform_create_gl_context(mimas_i32 const major, mimas_i32 const minor,
-                                 Mimas_GL_Profile const profile)
+Mimas_GL_Context* mimas_create_gl_context(mimas_i32 const major,
+                                          mimas_i32 const minor,
+                                          Mimas_GL_Profile const profile)
 {
   Mimas_Win_Platform* const platform =
     (Mimas_Win_Platform*)_mimas_get_mimas_internal()->platform;
@@ -46,14 +46,14 @@ mimas_platform_create_gl_context(mimas_i32 const major, mimas_i32 const minor,
   return (Mimas_GL_Context*)hglrc;
 }
 
-void mimas_platform_destroy_gl_context(Mimas_GL_Context* const ctx)
+void mimas_destroy_gl_context(Mimas_GL_Context* const ctx)
 {
   wglMakeCurrent(NULL, NULL);
   wglDeleteContext((HGLRC)ctx);
 }
 
-mimas_bool mimas_platform_make_context_current(Mimas_Window* const window,
-                                               Mimas_GL_Context* const ctx)
+mimas_bool mimas_make_context_current(Mimas_Window* const window,
+                                      Mimas_GL_Context* const ctx)
 {
   Mimas_Win_Window* const native_window =
     (Mimas_Win_Window*)window->native_window;
@@ -65,19 +65,19 @@ mimas_bool mimas_platform_make_context_current(Mimas_Window* const window,
   return mimas_true;
 }
 
-void mimas_platform_swap_buffers(Mimas_Window* const window)
+void mimas_swap_buffers(Mimas_Window* const window)
 {
   Mimas_Win_Window* const native_window =
     (Mimas_Win_Window*)window->native_window;
   wglSwapBuffers(native_window->hdc);
 }
 
-void mimas_platform_set_swap_interval(mimas_i32 const interval)
+void mimas_set_swap_interval(mimas_i32 const interval)
 {
   wglSwapIntervalEXT(interval);
 }
 
-mimas_i32 mimas_platform_get_swap_interval(void)
+mimas_i32 mimas_get_swap_interval(void)
 {
   return wglGetSwapIntervalEXT();
 }
